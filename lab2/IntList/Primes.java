@@ -64,8 +64,11 @@ public class Primes {
             n = n >> 1; // n = n/2
             a = (a * a) % p;
         }
+
         return res;
+
     }
+
 
     /** Driver Code */
     public static void main(String[] args) {
