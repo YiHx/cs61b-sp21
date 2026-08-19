@@ -94,6 +94,11 @@ public class Model extends Observable {
         setChanged();
     }
 
+
+
+
+
+
     /** Tilt the board toward SIDE. Return true iff this changes the board.
      *
      * 1. If two Tile objects are adjacent in the direction of motion and have
@@ -109,16 +114,62 @@ public class Model extends Observable {
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
+        int[] checkout = new int[]{0,0,0,0};
 
-        // TODO: Modify this.board (and perhaps this.score) to account
-        // for the tilt to the Side SIDE. If the board changed, set the
-        // changed local variable to true.
+        if(side == Side.NORTH){
+
+            if(function1(checkout))changed=true;
+        }else{
+            board.setViewingPerspective(side);
+            if(function1(checkout))changed=true;
+            board.setViewingPerspective(Side.NORTH);
+        }
 
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
+    }
+    public boolean checkchange(int i,int j,int[] checkout){
+        for(int curr=board.size()-1-checkout[i];curr>=j;curr--){
+            Tile now =board.tile(i,j);
+            if (curr==j)continue;
+            if(board.tile(i,curr)!=null&&(board.tile(i,curr).value()==board.tile(i,j).value())){
+                boolean noww=true;
+                for(int idx=curr-1;idx>j;idx--){
+                    if(board.tile(i,idx)!=null) {noww=false;break;}
+                }
+                if(noww) {
+                    checkout[i] = board.size() - curr;
+                    score += (board.tile(i, j).value() + board.tile(i, j).value());
+                    board.move(i, curr, now);
+
+                    return true;
+                }
+                continue;
+            }
+            if(board.tile(i,curr)==null){
+                board.move(i,curr,now);
+                return true;
+            }
+
+        }
+        return false;
+    }
+    public boolean function1(int[] checkout ) {
+        boolean temp=false;
+        for (int i = 0; i < board.size(); i++) {
+            for (int j = 2; j >= 0; j--) {
+                if (board.tile(i, j) == null) continue;
+                if (checkchange(i, j, checkout)) {
+                    temp= true;
+                }
+
+            }
+
+        }
+        return temp;
     }
 
     /** Checks if the game is over and sets the gameOver variable
