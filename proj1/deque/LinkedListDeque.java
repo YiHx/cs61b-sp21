@@ -77,6 +77,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
             System.out.print(curr.item);
             curr = curr.next;
         }
+        System.out.println();
     }
 
     public T removeFirst() {
