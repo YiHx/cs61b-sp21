@@ -1,19 +1,18 @@
 package deque;
 
-import afu.org.checkerframework.checker.oigj.qual.O;
 
 import java.util.Iterator;
 
 public class ArrayDeque<T> implements Iterable<T>{
     private T[] array;
     private int size;
-    private int nextEnd;
+    private int nextLast;
     private int nextFirst;
 
     public ArrayDeque() {
         array = (T[]) new Object[8];
         size = 0;
-        nextEnd = 0;
+        nextLast = 0;
         nextFirst = 1;
     }
 
@@ -64,8 +63,8 @@ public class ArrayDeque<T> implements Iterable<T>{
 
     public void addLast(T item) {
         checkCapacity();
-        array[nextEnd] = item;
-        nextEnd = (nextEnd + 1) % array.length;
+        array[nextLast] = item;
+        nextLast = (nextLast + 1) % array.length;
         size++;
     }
 
@@ -96,8 +95,8 @@ public class ArrayDeque<T> implements Iterable<T>{
 
     public T removeLast() {
         if (isEmpty()) return null;
-        T item = arry(nextEnd - 1 + array.length) % array.length;
-        nextEnd = (nextEnd - 1 + array.length) % array.length;
+        T item = array[(nextLast - 1 + array.length) % array.length];
+        nextLast = (nextLast - 1 + array.length) % array.length;
         return item;
     }
 
