@@ -12,8 +12,8 @@ public class ArrayDeque<T> implements Iterable<T>{
     public ArrayDeque() {
         array = (T[]) new Object[8];
         size = 0;
-        nextLast = 0;
-        nextFirst = 1;
+        nextLast = 1;
+        nextFirst = 0;
     }
 
     private class ArrayDequeIterator implements Iterator<T>{
@@ -97,6 +97,7 @@ public class ArrayDeque<T> implements Iterable<T>{
         if (isEmpty()) return null;
         T item = array[(nextLast - 1 + array.length) % array.length];
         nextLast = (nextLast - 1 + array.length) % array.length;
+        size--;
         return item;
     }
 
@@ -119,7 +120,7 @@ public class ArrayDeque<T> implements Iterable<T>{
             ArrayDeque<T> curr =(ArrayDeque<T>) o;
             if(curr.size!=this.size)return false;
             for(int i=0;i<size;i++){
-                if(curr.get(i)!=this.get(i))return false;
+                if (!curr.get(i).equals(this.get(i))) return false;
             }
             return true;
         }
