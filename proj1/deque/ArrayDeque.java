@@ -92,8 +92,8 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
             return null;
         }
         T item = array[(nextFirst + 1) % array.length];
-        nextFirst = (nextFirst + 1) % array.length;
         array[(nextFirst + 1) % array.length] = null;
+        nextFirst = (nextFirst + 1) % array.length;
         size--;
         checkCapacity();
         return item;
@@ -104,8 +104,8 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
             return null;
         }
         T item = array[(nextLast - 1 + array.length) % array.length];
-        nextLast = (nextLast - 1 + array.length) % array.length;
         array[(nextLast - 1 + array.length) % array.length] = null;
+        nextLast = (nextLast - 1 + array.length) % array.length;
         size--;
         checkCapacity();
         return item;
