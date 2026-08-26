@@ -7,12 +7,12 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
 
     private static class DLList<T> {
-        public T item;
-        public DLList<T> prev;
-        public DLList<T> next;
+        T item;
+        DLList<T> prev;
+        DLList<T> next;
 
 
-        public DLList(T item, DLList<T> prev, DLList<T> next) {
+        DLList(T item, DLList<T> prev, DLList<T> next) {
             this.item = item;
             this.prev = prev;
             this.next = next;
@@ -81,22 +81,24 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
     }
 
     public T removeFirst() {
-        if (size == 0) return null;
+        if (size == 0) {
+            return null;
+        }
         size--;
         T item = sentinel.next.item;
         sentinel.next.next.prev = sentinel;
         sentinel.next = sentinel.next.next;
-        checkCapacity();
         return item;
     }
 
     public T removeLast() {
-        if (size == 0) return null;
+        if (size == 0) {
+            return null;
+        }
         size--;
         T item = sentinel.prev.item;
         sentinel.prev.prev.next = sentinel;
         sentinel.prev = sentinel.prev.prev;
-        checkCapacity();
         return item;
     }
 

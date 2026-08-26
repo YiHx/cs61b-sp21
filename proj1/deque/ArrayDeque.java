@@ -88,18 +88,26 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
     }
 
     public T removeFirst() {
-        if (isEmpty()) return null;
+        if (isEmpty()) {
+            return null;
+        }
         T item = array[(nextFirst + 1) % array.length];
         nextFirst = (nextFirst + 1) % array.length;
+        array[(nextFirst + 1) % array.length] = null;
         size--;
+        checkCapacity();
         return item;
     }
 
     public T removeLast() {
-        if (isEmpty()) return null;
+        if (isEmpty()) {
+            return null;
+        }
         T item = array[(nextLast - 1 + array.length) % array.length];
         nextLast = (nextLast - 1 + array.length) % array.length;
+        array[(nextLast - 1 + array.length) % array.length] = null;
         size--;
+        checkCapacity();
         return item;
     }
 
