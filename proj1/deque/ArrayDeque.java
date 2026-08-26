@@ -3,7 +3,7 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Iterable<T> , Deque<T>{
+public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
     private T[] array;
     private int size;
     private int nextLast;
@@ -16,16 +16,18 @@ public class ArrayDeque<T> implements Iterable<T> , Deque<T>{
         nextFirst = 0;
     }
 
-    private class ArrayDequeIterator implements Iterator<T>{
+    private class ArrayDequeIterator implements Iterator<T> {
         int curr;
-        public ArrayDequeIterator(){
-            curr=0;
+
+        public ArrayDequeIterator() {
+            curr = 0;
         }
-        public boolean hasNext(){
+
+        public boolean hasNext() {
             return curr < size;
         }
 
-        public T next(){
+        public T next() {
             T returnValue = get(curr);
             curr++;
             return returnValue;
@@ -115,19 +117,29 @@ public class ArrayDeque<T> implements Iterable<T> , Deque<T>{
     }
 
     @Override
-    public boolean equals(Object o){
-        if(o instanceof ArrayDeque){
-            ArrayDeque<T> curr =(ArrayDeque<T>) o;
-            if(curr.size!=this.size)return false;
-            for(int i=0;i<size;i++){
-                if (!curr.get(i).equals(this.get(i))) return false;
-            }
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        return false;
+        if (o == null) {
+            return false;
+        }
+        if (!(o instanceof Deque)) {
+            return false;
+        }
+
+        Deque<T> other = (Deque<T>) o;
+        if (this.size() != other.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < size; i++) {
+            if (!this.get(i).equals(other.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
-
-
 
 
 }

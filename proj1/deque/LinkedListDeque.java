@@ -3,7 +3,7 @@ package deque;
 
 import java.util.Iterator;
 
-public class LinkedListDeque<T> implements Iterable<T> , Deque<T> {
+public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
 
     private static class DLList<T> {
@@ -86,6 +86,7 @@ public class LinkedListDeque<T> implements Iterable<T> , Deque<T> {
         T item = sentinel.next.item;
         sentinel.next.next.prev = sentinel;
         sentinel.next = sentinel.next.next;
+        checkCapacity();
         return item;
     }
 
@@ -95,13 +96,14 @@ public class LinkedListDeque<T> implements Iterable<T> , Deque<T> {
         T item = sentinel.prev.item;
         sentinel.prev.prev.next = sentinel;
         sentinel.prev = sentinel.prev.prev;
+        checkCapacity();
         return item;
     }
 
     public T get(int index) {
         if (index < 0 || index >= size) return null;
         DLList<T> curr = sentinel.next;
-        for (int i = 0; i <= index; i++) {
+        for (int i = 0; i < index; i++) {
             curr = curr.next;
         }
         return curr.item;
@@ -114,34 +116,46 @@ public class LinkedListDeque<T> implements Iterable<T> , Deque<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof LinkedListDeque) {
-            LinkedListDeque<T> curr = (LinkedListDeque<T>) o;
-            if (this.size!=curr.size)return false;
-            for (int i = 0; i < this.size; i++) {
-                if (!curr.get(i).equals(this.get(i))) return false;
-            }
+        if (this == o) {
             return true;
         }
-        return false;
+        if (o == null) {
+            return false;
+        }
+        if (!(o instanceof Deque)) {
+            return false;
+        }
+
+        Deque<T> other = (Deque<T>) o;
+        if (this.size() != other.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < size; i++) {
+            if (!this.get(i).equals(other.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    private T innerRecursive(int idx,DLList<T> dll){
-        if(idx==0){
+    private T innerRecursive(int idx, DLList<T> dll) {
+        if (idx == 0) {
             return dll.item;
         }
-        return innerRecursive(idx-1,dll.next);
+        return innerRecursive(idx - 1, dll.next);
     }
 
     public T getRecursive(int index) {
-        if(index<0||index>=size){return null;}
+        if (index < 0 || index >= size) {
+            return null;
+        }
 
-        DLList<T> curr =sentinel.next;
-        return innerRecursive(index,curr);
-
+        DLList<T> curr = sentinel.next;
+        return innerRecursive(index, curr);
 
 
     }
-
 
 
 }

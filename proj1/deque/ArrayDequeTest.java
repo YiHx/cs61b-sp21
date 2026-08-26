@@ -9,8 +9,8 @@ import org.junit.Test;
 public class ArrayDequeTest {
 
     @Test
-    public void test1(){
-        ArrayDeque<Integer> test1 =new ArrayDeque<>();
+    public void test1() {
+        ArrayDeque<Integer> test1 = new ArrayDeque<>();
         test1.addFirst(1);
         test1.addFirst(2);
         test1.addFirst(3);
@@ -26,8 +26,8 @@ public class ArrayDequeTest {
     }
 
     @Test
-    public void test2(){
-        ArrayDeque<String> test2 =new ArrayDeque<>();
+    public void test2() {
+        ArrayDeque<String> test2 = new ArrayDeque<>();
         test2.addFirst("Big");
         test2.addFirst("Dick");
         test2.addFirst("Fuck");
