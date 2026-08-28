@@ -5,7 +5,7 @@ import java.io.Serializable;
 import static capers.Utils.*;
 
 /** Represents a dog that can be serialized.
- * @author TODO
+ * @author xunah08
 */
 public class Dog { // TODO
 
@@ -56,7 +56,8 @@ public class Dog { // TODO
      * Saves a dog to a file for future use.
      */
     public void saveDog() {
-        // TODO (hint: don't forget dog names are unique)
+        File dog = join(CapersRepository.CAPERS_FOLDER,"dog");
+        File file = new File()
     }
 
     @Override
