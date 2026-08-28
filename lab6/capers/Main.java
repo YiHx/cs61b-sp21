@@ -54,8 +54,7 @@ public class Main {
             break;
         case "dog":
             validateNumArgs("dog", args, 4);
-            System.out.println("Woof! My name is "+args[1]+" and I am a "+args[2]+"! I am "+args[3]+" years old! Woof!");
-            File newDog = new File ("")
+
             break;
         case "birthday":
             validateNumArgs("birthday", args, 2);
