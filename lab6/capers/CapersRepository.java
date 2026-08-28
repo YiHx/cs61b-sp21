@@ -38,9 +38,7 @@ public class CapersRepository {
             Dog.DOG_FOLDER.mkdir();
         }
         File story = join(CAPERS_FOLDER,"story");
-        if(!story.exists()){
-            story.mkdir();
-        }
+
     }
 
 
@@ -56,9 +54,9 @@ public class CapersRepository {
             currString = Utils.readContentsAsString(story);
         }
 
-        currString =currString+"text"+"\n";
+        currString =currString+text+"\n";
         Utils.writeContents(story,currString);
-        System.out.println(Utils.readContentsAsString(story));
+        System.out.print(Utils.readContentsAsString(story));
     }
 
     /**
@@ -69,7 +67,7 @@ public class CapersRepository {
     public static void makeDog(String name, String breed, int age) {
         Dog d = new Dog(name, breed, age);
         d.saveDog();
-        System.out.println(d.toString());
+        System.out.println(d);
 
     }
 
@@ -83,6 +81,5 @@ public class CapersRepository {
         Dog d = Dog.fromFile(name);
         d.haveBirthday();
         d.saveDog();
-        System.out.println(d.toString());
     }
 }
