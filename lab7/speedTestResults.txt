@@ -1,0 +1,48 @@
+This program inserts random Strings of length L into different types of maps as <String, Integer> pairs.
+Please enter desired length of each string: qwer
+Please enter a positive integer: 100000
+
+Enter # strings to insert into the maps: fadfadfaa
+Please enter a positive integer: 10000
+class bstmap.ULLMap: 5.15 sec
+class bstmap.BSTMap: 4.54 sec
+Java's Built-in TreeMap: 4.51 sec
+Java's Built-in HashMap: 4.42 sec
+
+
+Enter # strings to insert into the maps: 1321312
+Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+	at java.base/java.lang.StringUTF16.compress(StringUTF16.java:214)
+	at java.base/java.lang.String.<init>(String.java:4855)
+	at java.base/java.lang.String.<init>(String.java:283)
+	at bstmap.StringUtils.randomString(StringUtils.java:27)
+	at bstmap.InsertRandomSpeedTest.insertRandom(InsertRandomSpeedTest.java:49)
+	at bstmap.InsertRandomSpeedTest.timeRandomMap61B(InsertRandomSpeedTest.java:86)
+	at bstmap.InsertRandomSpeedTest.main(InsertRandomSpeedTest.java:32)
+
+
+Enter # strings to insert into the maps: aaaaa
+Please enter a positive integer: 99999
+--Stack Overflow -- couldn't add 99999 strings.
+--Stack Overflow -- couldn't add 99999 strings.
+Java's Built-in TreeMap: 0.06 sec
+Java's Built-in HashMap: 0.03 sec
+
+Enter # strings to insert into the maps: aaaaaaaaaa
+Please enter a positive integer: 1111111
+--Stack Overflow -- couldn't add 1111111 strings of length 10.
+class bstmap.BSTMap: 1.52 sec
+Java's Built-in TreeMap: 1.13 sec
+Java's Built-in HashMap: 0.34 sec
+
+Enter # strings to insert into the maps: 30
+class bstmap.ULLMap: 0.00 sec
+class bstmap.BSTMap: 0.00 sec
+Java's Built-in TreeMap: 0.00 sec
+
+
+Enter # strings to insert into the maps: 1000000
+--Stack Overflow -- couldn't add 1000000 strings of length 10.
+class bstmap.BSTMap: 1.37 sec
+Java's Built-in TreeMap: 0.88 sec
+Java's Built-in HashMap: 0.33 sec
