@@ -1,6 +1,5 @@
 package bstmap;
 
-import afu.org.checkerframework.checker.oigj.qual.O;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -51,8 +50,22 @@ public class BSTMap<K extends Comparable<K>,V> implements Map61B<K,V> {
 
     @Override
     public void put (K key,V value){
-
+        if (Tree != null) {
+            BSTNode aNode = Tree.get(key);
+            if (aNode == null) {
+                Tree= Tree.insert(Tree,key,value);
+                size++;
+            } else {
+                aNode.value = value;
+            }
+        } else {
+            Tree = new BSTNode(key, value, null,null);
+            size++;
+        }
     }
+
+
+
 
 
     @Override
@@ -102,6 +115,20 @@ public class BSTMap<K extends Comparable<K>,V> implements Map61B<K,V> {
                 return this.leftNode.get(k);
             }
             return null;
+        }
+
+        BSTNode insert( BSTNode Node, K key,V value) {
+            if (Node == null){
+                return new BSTNode(key,value,null,null);
+            }
+            if (key.compareTo(Node.key)<0 ){
+                Node.leftNode = insert(Node.leftNode, key,value);
+            }
+            else if (key.compareTo(Node.key)>0 ){
+                Node.rightNode = insert(Node.rightNode, key,value);
+            }
+            return Node;
+
         }
 
     }
