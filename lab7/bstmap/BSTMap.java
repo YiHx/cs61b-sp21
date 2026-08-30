@@ -90,6 +90,10 @@ public class BSTMap<K extends Comparable<K>,V> implements Map61B<K,V> {
         throw new UnsupportedOperationException();
     }
 
+    public void printInOrder(){
+        Tree.printInOrder();
+    }
+
     private class BSTNode{
         K key;
         V value;
@@ -131,11 +135,11 @@ public class BSTMap<K extends Comparable<K>,V> implements Map61B<K,V> {
             return Node;
 
         }
-        public void printInOrder(){
+        void printInOrder(){
             printInOrder(Tree);
         }
 
-        public void printInOrder(BSTNode Node){
+        void printInOrder(BSTNode Node){
             if(Node==null){
                 return ;
             }
