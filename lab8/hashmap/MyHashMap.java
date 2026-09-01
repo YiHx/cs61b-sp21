@@ -7,9 +7,15 @@ import java.util.Collection;
  *  access to elements via get(), remove(), and put() in the best case.
  *
  *  Assumes null keys will never be inserted, and does not resize down upon remove().
- *  @author YOUR NAME HERE
+ *  @author xuanh08
  */
-public class MyHashMap<K, V> implements Map61B<K, V> {
+public class    MyHashMap<K, V> implements Map61B<K, V> {
+
+
+    @Override
+    public V remove(K key){
+        throw  new UnsupportedOperationException();
+    }
 
     /**
      * Protected helper class to store key/value pairs
