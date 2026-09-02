@@ -1,7 +1,9 @@
 package hashmap;
 
 import java.util.Collection;
+import java.util.HashSet;
 import  java.util.LinkedList;
+import java.util.Set;
 
 /**
  *  A hash table-backed Map implementation. Provides amortized constant time
@@ -15,6 +17,7 @@ import  java.util.LinkedList;
         private int initialSize ;
         private double  loadFactor;
         private Collection<Node>[] table;
+        private  int size =0;
 
 
     @Override
@@ -119,7 +122,7 @@ import  java.util.LinkedList;
 
     public boolean containsKey(K key){
         int number =Math.floorMod(key.hashCode(),initialSize);
-        return table[number] != null;
+        return !table[number].isEmpty();
     }
 
 
@@ -129,9 +132,65 @@ import  java.util.LinkedList;
         }
 
         int number = Math.floorMod(key.hashCode(),initialSize);
-        for(auto it : table[number]){
-            if(i)
+        for(Node it : table[number]){
+            if(it.key==key){
+                return it.value;
+            }
+        }
+        return null;
+    }
+
+    public int size(){
+        return this.size;
+    }
+
+    public void put(K key,V value){
+        size++;
+        int number = Math.floorMod(key.hashCode(),initialSize);
+        Node curr = new Node(key,value);
+        if(table[number].isEmpty()){
+            table[number].add(curr);
+        }else{
+            for(Node it:table[number]){
+                if(it.key==key){
+                    it.value=value;
+                    return ;
+                }
+
+            }
+            table[number].add(curr);
+
         }
     }
+
+    public Set<K> keySet(){
+        Set<K> now =  new HashSet<>();
+        for (Collection<Node> nodes : table) {
+            if (nodes.isEmpty()) {
+                continue;
+            }
+            for (Node it : nodes) {
+                if (!now.contains(it.key)) {
+                    now.add(key);
+                }
+            }
+        }
+        return now;
+
+    }
+
+
+    public V remove (K key){
+        int number = Math.floorMod(key.hashCode(),initialSize);
+
+            for(Node it: table[number]){
+                if(it.key==key){
+                    nodes.remove(key);
+                }
+            }
+        }
+
+
+
 
 }
