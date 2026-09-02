@@ -14,6 +14,7 @@ import  java.util.LinkedList;
 
         private int initialSize ;
         private double  loadFactor;
+        private Collection<Node>[] table;
 
 
     @Override
@@ -43,11 +44,13 @@ import  java.util.LinkedList;
     public MyHashMap() {
         initialSize =16;
         loadFactor =0.75;
+        table = createTable(initialSize);
     }
 
     public MyHashMap(int initialSize) {
         this.initialSize =initialSize;
         loadFactor =0.75;
+        table = createTable(initialSize);
     }
 
     /**
@@ -60,6 +63,7 @@ import  java.util.LinkedList;
     public MyHashMap(int initialSize, double maxLoad) {
         this.initialSize =initialSize;
         this.loadFactor = maxLoad;
+        table = createTable(initialSize);
     }
 
     /**
@@ -105,9 +109,29 @@ import  java.util.LinkedList;
         for (int i = 0; i < tableSize; i++) {
             table[i] = createBucket();
         }
+        return table;
     }
 
-    // TODO: Implement the methods of the Map61B Interface below
-    // Your code won't compile until you do so!
+
+    public void clear(){
+        table = createTable(this.initialSize);
+    }
+
+    public boolean containsKey(K key){
+        int number =Math.floorMod(key.hashCode(),initialSize);
+        return table[number] != null;
+    }
+
+
+    public V get(K key){
+        if(!containsKey(key)){
+            return null;
+        }
+
+        int number = Math.floorMod(key.hashCode(),initialSize);
+        for(auto it : table[number]){
+            if(i)
+        }
+    }
 
 }
