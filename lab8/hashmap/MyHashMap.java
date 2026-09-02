@@ -9,7 +9,10 @@ import java.util.Collection;
  *  Assumes null keys will never be inserted, and does not resize down upon remove().
  *  @author xuanh08
  */
-public class    MyHashMap<K, V> implements Map61B<K, V> {
+    public class    MyHashMap<K, V> implements Map61B<K, V> {
+
+        private int initialSize ;
+        private double  loadFactor;
 
 
     @Override
@@ -36,9 +39,15 @@ public class    MyHashMap<K, V> implements Map61B<K, V> {
     // You should probably define some more!
 
     /** Constructors */
-    public MyHashMap() { }
+    public MyHashMap() {
+        initialSize =16;
+        loadFactor =0.75;
+    }
 
-    public MyHashMap(int initialSize) { }
+    public MyHashMap(int initialSize) {
+        this.initialSize =initialSize;
+        loadFactor =0.75;
+    }
 
     /**
      * MyHashMap constructor that creates a backing array of initialSize.
@@ -47,7 +56,10 @@ public class    MyHashMap<K, V> implements Map61B<K, V> {
      * @param initialSize initial size of backing array
      * @param maxLoad maximum load factor
      */
-    public MyHashMap(int initialSize, double maxLoad) { }
+    public MyHashMap(int initialSize, double maxLoad) {
+        this.initialSize =initialSize;
+        this.loadFactor = maxLoad;
+    }
 
     /**
      * Returns a new node to be placed in a hash table bucket
