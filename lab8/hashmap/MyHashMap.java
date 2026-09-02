@@ -1,6 +1,7 @@
 package hashmap;
 
 import java.util.Collection;
+import  java.util.LinkedList;
 
 /**
  *  A hash table-backed Map implementation. Provides amortized constant time
@@ -65,7 +66,7 @@ import java.util.Collection;
      * Returns a new node to be placed in a hash table bucket
      */
     private Node createNode(K key, V value) {
-        return null;
+        return new Node(key, value);
     }
 
     /**
@@ -87,7 +88,7 @@ import java.util.Collection;
      * OWN BUCKET DATA STRUCTURES WITH THE NEW OPERATOR!
      */
     protected Collection<Node> createBucket() {
-        return null;
+        return new LinkedList<>();
     }
 
     /**
@@ -100,7 +101,10 @@ import java.util.Collection;
      * @param tableSize the size of the table to create
      */
     private Collection<Node>[] createTable(int tableSize) {
-        return null;
+        Collection<Node>[] table = (Collection<Node>[]) new Collection[tableSize];
+        for (int i = 0; i < tableSize; i++) {
+            table[i] = createBucket();
+        }
     }
 
     // TODO: Implement the methods of the Map61B Interface below
