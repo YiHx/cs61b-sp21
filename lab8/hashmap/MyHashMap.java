@@ -1,9 +1,6 @@
 package hashmap;
 
-import java.util.Collection;
-import java.util.HashSet;
-import  java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 /**
  *  A hash table-backed Map implementation. Provides amortized constant time
@@ -133,7 +130,7 @@ import java.util.Set;
 
         int number = Math.floorMod(key.hashCode(),initialSize);
         for(Node it : table[number]){
-            if(it.key==key){
+            if(it.key.equals(key)){
                 return it.value;
             }
         }
@@ -152,7 +149,7 @@ import java.util.Set;
             table[number].add(curr);
         }else{
             for(Node it:table[number]){
-                if(it.key==key){
+                if(it.key.equals(key)){
                     it.value=value;
                     return ;
                 }
@@ -180,16 +177,44 @@ import java.util.Set;
     }
 
 
-    public V remove (K key){
-        int number = Math.floorMod(key.hashCode(),initialSize);
+//    public V remove (K key){
+//        if (key == null) {
+//            return null;
+//        }
+//        int number = Math.floorMod(key.hashCode(),initialSize);
+//        Iterator<Node> it = table[number].iterator();
+//            while(it.hasNext()){
+//                Node node =it.next();
+//                if(node.key.equals(key)){
+//                    V val = node.value;
+//                    it.remove();
+//                    return val;
+//                }
+//            }
+//            return null;
+//        }
 
-            for(Node it: table[number]){
-                if(it.key==key){
-                    nodes.remove(key);
+    public V remove(K key, V value){
+        throw new UnsupportedOperationException();
+
+    }
+
+    public void resize(){
+        if((double)size/(double)initialSize>loadFactor){
+            Collection<Node>[] curr = table;
+            table = createTable(initialSize*2);
+            initialSize =initialSize*2;
+            for(Collection<Node> nodes : curr){
+                if(nodes.isEmpty()){
+                    continue;
+                }
+                for(Node now : nodes){
+                    int number = Math.floorMod(now.key.hashCode(),initialSize);
+                    table[number].add(now);
                 }
             }
         }
-
+    }
 
 
 
