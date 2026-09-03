@@ -120,9 +120,15 @@ import java.util.*;
         size=0;
     }
 
-    public boolean containsKey(K key){
-        int number =Math.floorMod(key.hashCode(),initialSize);
-        return !table[number].isEmpty();
+    public boolean containsKey(K key) {
+        if (key == null) return false;
+        int number = Math.floorMod(key.hashCode(), initialSize);
+        for (Node it : table[number]) {
+            if (it.key.equals(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -146,10 +152,11 @@ import java.util.*;
 
     public void put(K key,V value){
         int number = Math.floorMod(key.hashCode(),initialSize);
-        Node curr = new Node(key,value);
+        Node curr = createNode(key,value);
         if(table[number].isEmpty()){
             table[number].add(curr);
             size++;
+            resize();
         }else{
             for(Node it:table[number]){
                 if(it.key.equals(key)){
@@ -160,6 +167,7 @@ import java.util.*;
             }
             table[number].add(curr);
             size++;
+            resize();
 
         }
     }
