@@ -1,5 +1,7 @@
 package hashmap;
 
+import org.junit.Test;
+
 import java.util.*;
 
 /**
@@ -115,6 +117,7 @@ import java.util.*;
 
     public void clear(){
         table = createTable(this.initialSize);
+        size=0;
     }
 
     public boolean containsKey(K key){
@@ -142,11 +145,11 @@ import java.util.*;
     }
 
     public void put(K key,V value){
-        size++;
         int number = Math.floorMod(key.hashCode(),initialSize);
         Node curr = new Node(key,value);
         if(table[number].isEmpty()){
             table[number].add(curr);
+            size++;
         }else{
             for(Node it:table[number]){
                 if(it.key.equals(key)){
@@ -156,6 +159,7 @@ import java.util.*;
 
             }
             table[number].add(curr);
+            size++;
 
         }
     }
@@ -167,9 +171,7 @@ import java.util.*;
                 continue;
             }
             for (Node it : nodes) {
-                if (!now.contains(it.key)) {
-                    now.add(key);
-                }
+                now.add(it.key);
             }
         }
         return now;
@@ -216,6 +218,10 @@ import java.util.*;
         }
     }
 
+
+    public Iterator<K> iterator(){
+        return keySet().iterator();
+    }
 
 
 }
