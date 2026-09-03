@@ -19,10 +19,10 @@ import java.util.*;
         private  int size =0;
 
 
-    @Override
-    public V remove(K key){
-        throw  new UnsupportedOperationException();
-    }
+//    @Override
+//    public V remove(K key){
+//        throw  new UnsupportedOperationException();
+//    }
 
     /**
      * Protected helper class to store key/value pairs
@@ -187,27 +187,50 @@ import java.util.*;
     }
 
 
-//    public V remove (K key){
-//        if (key == null) {
-//            return null;
-//        }
-//        int number = Math.floorMod(key.hashCode(),initialSize);
-//        Iterator<Node> it = table[number].iterator();
-//            while(it.hasNext()){
-//                Node node =it.next();
-//                if(node.key.equals(key)){
-//                    V val = node.value;
-//                    it.remove();
-//                    return val;
-//                }
-//            }
-//            return null;
-//        }
 
-    public V remove(K key, V value){
-        throw new UnsupportedOperationException();
 
+    public  V remove(K key, V value){
+        if(key==null){
+            return null;
+        }
+
+        int number = Math.floorMod(key.hashCode(),initialSize);
+        Node now = createNode(key,value);
+        if(table[number].isEmpty()){
+            return null;
+        }
+        for(Node it :table[number]){
+            if(it.equals(now)){
+                V val = it.value;
+                size--;
+                table[number].remove(now);
+                return val;
+            }
+        }
+        return null;
     }
+    public V remove (K key){
+        if (key == null) {
+            return null;
+        }
+        int number = Math.floorMod(key.hashCode(),initialSize);
+        Iterator<Node> it = table[number].iterator();
+            while(it.hasNext()){
+                Node node =it.next();
+                if(node.key.equals(key)){
+                    V val = node.value;
+                    it.remove();
+                    size--;
+                    return val;
+                }
+            }
+            return null;
+        }
+
+//    public V remove(K key, V value){
+//        throw new UnsupportedOperationException();
+//
+//    }
 
     public void resize(){
         if((double)size/(double)initialSize>loadFactor){
