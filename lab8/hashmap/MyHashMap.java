@@ -228,10 +228,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         return null;
     }
 
-//    public V remove(K key, V value){
-//        throw new UnsupportedOperationException();
-//
-//    }
+
 
     private void resize() {
         if ((double) size / (double) initialSize > loadFactor) {
