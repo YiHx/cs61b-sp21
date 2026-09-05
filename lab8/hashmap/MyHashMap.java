@@ -19,10 +19,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     private int size = 0;
 
 
-//    @Override
-//    public V remove(K key){
-//        throw  new UnsupportedOperationException();
-//    }
+
 
     /**
      * Protected helper class to store key/value pairs
