@@ -26,4 +26,11 @@ public class Repository {
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
     /* TODO: fill in the rest of this class. */
+    public static void initFunction(){
+        if(!GITLET_DIR.exists()){
+            GITLET_DIR.mkdir();
+        }
+
+    }
+
 }
