@@ -29,6 +29,12 @@ public class Repository {
     public static void initFunction(){
         if(!GITLET_DIR.exists()){
             GITLET_DIR.mkdir();
+            File nowFile = join(GITLET_DIR,"objects","commits");
+            if(!nowFile.exists()){
+                nowFile.mkdir();
+            }
+            Commit nowCommit = new Commit();
+            byte[] nowSerialize =Utils.serialize(nowCommit);
 
         }else {
             System.out.println("A Gitlet version-control system already exists in the current directory.");

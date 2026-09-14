@@ -2,7 +2,9 @@ package gitlet;
 
 // TODO: any imports you need here
 
-import java.util.Date; // TODO: You'll likely use this in this class
+import java.io.Serializable;
+import java.util.Date;
+import java.text.SimpleDateFormat;// TODO: You'll likely use this in this class
 
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
@@ -10,7 +12,7 @@ import java.util.Date; // TODO: You'll likely use this in this class
  *
  *  @author xuanh08
  */
-public class Commit {
+public class Commit implements Serializable {
     /**
      * TODO: add instance variables here.
      *
@@ -20,7 +22,21 @@ public class Commit {
      */
 
     /** The message of this Commit. */
-    private String message;
+    private String message = "initial commit";
+    private String date;
 
     /* TODO: fill in the rest of this class. */
+//   第一次提交
+    public Commit(){
+        this.date = "01/01/1970:0000";
+
+    }
+//  其余的提交
+    public Commmit(String message){
+        this.message =message;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy:HHmm");
+        Date date = new Date();
+        this.date = sdf.format(date);
+
+    }
 }
