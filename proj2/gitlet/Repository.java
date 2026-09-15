@@ -41,6 +41,9 @@ public class Repository {
             if(!nowFile.exists()){
                 nowFile.mkdirs();
             }
+
+            File indexFile = join(GITLET_DIR,"index");
+            indexFile.mkdir();
 //            检查完毕创建一个新的提交，此时没有跟踪任何文件
             Commit nowCommit = new gitlet.Commit();
             String nowSha1String = Utils.sha1(Utils.serialize(nowCommit));
@@ -56,7 +59,18 @@ public class Repository {
 
     }
 
-    public static void createCommit(){
+    public void addFunction(String fileName){
+//        判断当前文件是否存在
+        File directFile = join(CWD,fileName);
+        if(!directFile.exists()){
+            System.out.println("File does not exist.");
+            System.exit(0);
+        }
+//        将当前目录的文件放入暂存区
+        File indexFile = join(GITLET_DIR,"index");
+        byte[] thisFile =Utils.readContents(directFile);
+        Utils.writeContents(join(indexFile,fileName),thisFile);
+
 
     }
 

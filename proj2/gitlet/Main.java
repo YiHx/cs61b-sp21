@@ -25,7 +25,18 @@ public class Main {
                 nowAction.initFunction();
                 break;
             case "add":
-                // TODO: handle the `add [filename]` command
+                if(args.length>2){
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
+                }
+                if(args.length == 0){
+                    System.out.println("Please enter a command.");
+                    System.exit(0);
+                }
+                if(!Repository.GITLET_DIR.exists()){
+                    System.out.println("Not in an initialized Gitlet directory.");
+                    System.exit(0);
+                }
                 break;
             // TODO: FILL THE REST IN
         }
