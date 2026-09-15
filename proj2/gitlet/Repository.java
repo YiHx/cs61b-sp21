@@ -20,22 +20,31 @@ public class Repository {
      * variable is used. We've provided two examples for you.
      */
 
+    public static  String head;
+
     /** The current working directory. */
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
     /* TODO: fill in the rest of this class. */
-    public static void initFunction(){
+    public Repository(){
+
+    }
+
+    public  void initFunction(){
+//        判断.gitlet目录是否存在，如果不存在则创建
         if(!GITLET_DIR.exists()){
             GITLET_DIR.mkdir();
             File nowFile = join(GITLET_DIR,"objects","commits");
+//            判断commits目录是否存在，如果不存在则创建
             if(!nowFile.exists()){
                 nowFile.mkdir();
             }
-            Commit nowCommit = new Commit();
+//            检查完毕创建一个新的提交，此时没有跟踪任何文件
+            Commit nowCommit = new gitlet.Commit();
             byte[] nowSerialize =Utils.serialize(nowCommit);
-
+            head =Utils.sha1((Object) nowSerialize);
         }else {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);

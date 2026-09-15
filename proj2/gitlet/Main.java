@@ -21,7 +21,8 @@ public class Main {
                     System.out.println("Incorrect operands.");
                     System.exit(0);
                 }
-                Repository.initFunction();
+                Repository nowAction =new Repository();
+                nowAction.initFunction();
                 break;
             case "add":
                 // TODO: handle the `add [filename]` command

@@ -5,6 +5,9 @@ package gitlet;
 import java.io.Serializable;
 import java.util.Date;
 import java.text.SimpleDateFormat;// TODO: You'll likely use this in this class
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
@@ -22,21 +25,30 @@ public class Commit implements Serializable {
      */
 
     /** The message of this Commit. */
-    private String message = "initial commit";
-    private String date;
+    public String message = "initial commit";
+    public String date;
+    public String parents;
+    public Map<String, String> commitFile = new HashMap<>();
+
+
 
     /* TODO: fill in the rest of this class. */
 //   第一次提交
     public Commit(){
-        this.date = "01/01/1970:0000";
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
+        this.date = sdf.format(new Date(0));
+        this.parents = "0";
+
 
     }
 //  其余的提交
-    public Commmit(String message){
+    public Commit(String message){
         this.message =message;
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy:HHmm");
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
         Date date = new Date();
         this.date = sdf.format(date);
+        this.parents = Repository.head;
+
 
     }
 }
