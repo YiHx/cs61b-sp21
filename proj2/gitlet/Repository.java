@@ -39,12 +39,16 @@ public class Repository {
             File nowFile = join(GITLET_DIR,"objects","commits");
 //            判断commits目录是否存在，如果不存在则创建
             if(!nowFile.exists()){
-                nowFile.mkdir();
+                nowFile.mkdirs();
             }
 //            检查完毕创建一个新的提交，此时没有跟踪任何文件
             Commit nowCommit = new gitlet.Commit();
-            byte[] nowSerialize =Utils.serialize(nowCommit);
-            head =Utils.sha1((Object) nowSerialize);
+            String nowSha1String = Utils.sha1(Utils.serialize(nowCommit));
+            Utils.writeObject(join(nowFile,nowSha1String), nowCommit);
+            head =nowSha1String;
+            File headFile =  join (GITLET_DIR,"HEAD");
+            Utils.writeContents(headFile,head);
+
         }else {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);
