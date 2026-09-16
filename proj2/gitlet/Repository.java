@@ -3,6 +3,7 @@ package gitlet;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static gitlet.Utils.*;
 
@@ -73,6 +74,19 @@ public class Repository {
         }
 //        将当前目录的文件放入暂存区
         File indexFile = join(GITLET_DIR,"index");
+        File BlobsFile = join(GITLET_DIR,"objects","Blobs");
+        List<String> alreadyFile = Utils.plainFilenamesIn(BlobsFile);
+        if (alreadyFile != null) {
+            for(String it : alreadyFile){
+                if(sha1(readContents(join(BlobsFile, it))).equals(sha1(readContents(directFile)))){
+                   File checkFile = join(indexFile,sha1(readContents(directFile)));
+                   if(checkFile.exists()){
+                       Utils.restrictedDelete(checkFile);
+                   }
+                   return;
+                }
+            }
+        }
         byte[] thisFile =Utils.readContents(directFile);
         Utils.writeContents(join(indexFile,fileName),thisFile);
 
@@ -80,8 +94,12 @@ public class Repository {
     }
 
     public static void commitFunction(String commitMessage){
+//        提取上一个提交并且新建当前的提交
         Commit lastCommit = Utils.readObject(join(GITLET_DIR,"HEAD"),Commit.class);
         Commit nowCommit = new Commit(commitMessage);
+
+//        将上一个提交中追踪的文件暂时全部都复制到当前的这个提交内，
+//        然后将暂存区里的文件一个一个更新到当前的提交的文件映射的map
         nowCommit.commitFile = lastCommit.commitFile;
         File indexFile = join(GITLET_DIR,"index");
         List<String> fileName = Utils.plainFilenamesIn(indexFile);
@@ -90,6 +108,11 @@ public class Repository {
         }
         for(String nowFile : fileName){
             File nowFileDirect = join(indexFile,nowFile);
+            String nowFileShaString = Utils.sha1(Utils.readContents(nowFileDirect));
+                nowCommit.commitFile.put(nowFile,nowFileShaString);
+                File BlobFile = join (GITLET_DIR,"objects","Blobs",nowFileShaString);
+                Utils.writeContents(BlobFile,Utils.readContents(nowFileDirect));
+                Utils.restrictedDelete(nowFileDirect);
         }
     }
 
