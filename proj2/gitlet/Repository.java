@@ -118,6 +118,16 @@ public class Repository {
                 Utils.writeContents(BlobFile,Utils.readContents(nowFileDirect));
                 nowFileDirect.delete();
         }
+        File stageFile = join(GITLET_DIR,"stage");
+        List<String> allStageFile = Utils.plainFilenamesIn(stageFile);
+        if(allStageFile!=null) {
+            for (String nowFile : allStageFile) {
+                File nowFileDirect = join(stageFile,nowFile);
+                String nowFileShaString = Utils.sha1(Utils.readContents(nowFileDirect));
+                nowCommit.commitFile.remove(nowFile,nowFileShaString);
+                nowFileDirect.delete();
+            }
+        }
         File nowFile = join(GITLET_DIR,"objects","commits");
         String nowSha1String = Utils.sha1(Utils.serialize(nowCommit));
         Utils.writeObject(join(nowFile,nowSha1String), nowCommit);
@@ -142,8 +152,14 @@ public class Repository {
         if(thisFile.exists()){
             thisFile.delete();
         }
+//        如果当前的文件被当前的头提交跟踪了，那么把这个文件添加到将要删除的区域，在下一个提交的时候把这个文件删除，
+//        同时把用户当前工作目录的这个文件删除
         if(lastCommit.commitFile.containsKey(fileName)){
-
+            File stageFile = join(GITLET_DIR,"stage",fileName);
+            File thisBlobFile = join(GITLET_DIR,"objects","Blobs",lastCommit.commitFile.get(fileName));
+            Utils.writeContents(stageFile,Utils.readContents(thisBlobFile));
+            File userFile = join(CWD,fileName);
+            userFile.delete();
         }
 
     }
