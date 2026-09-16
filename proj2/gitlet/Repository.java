@@ -48,6 +48,8 @@ public class Repository {
 
             File indexFile = join(GITLET_DIR,"index");
             File blobs = join(GITLET_DIR,"objects","Blobs");
+            File indexStage = join(GITLET_DIR,"stage");
+            indexStage.mkdir();
             blobs.mkdirs();
             indexFile.mkdir();
 //            检查完毕创建一个新的提交，此时没有跟踪任何文件
@@ -124,4 +126,18 @@ public class Repository {
         Utils.writeContents(headFile,head);
     }
 
+    public static void removeFunction(String fileName){
+        File indexFile = join(GITLET_DIR,"index");
+//        提取上一个提交
+        String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+        File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
+        Commit lastCommit = Utils.readObject(commitFile, Commit.class);
+//        判断是否当前要删除的文件是否在暂存区或者被上一个提交跟踪
+        if((!join(indexFile,fileName).exists())&&!lastCommit.commitFile.containsKey(fileName)){
+            System.out.println("No reason to remove the file.");
+            System.exit(0);
+        }
+
+
+    }
 }
