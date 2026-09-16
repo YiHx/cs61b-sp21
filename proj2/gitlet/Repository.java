@@ -1,6 +1,9 @@
 package gitlet;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
+
 import static gitlet.Utils.*;
 
 // TODO: any imports you need here
@@ -43,6 +46,8 @@ public class Repository {
             }
 
             File indexFile = join(GITLET_DIR,"index");
+            File blobs = join(GITLET_DIR,"objects","Blobs");
+            blobs.mkdirs();
             indexFile.mkdir();
 //            检查完毕创建一个新的提交，此时没有跟踪任何文件
             Commit nowCommit = new gitlet.Commit();
@@ -59,7 +64,7 @@ public class Repository {
 
     }
 
-    public void addFunction(String fileName){
+    public static void addFunction(String fileName){
 //        判断当前文件是否存在
         File directFile = join(CWD,fileName);
         if(!directFile.exists()){
@@ -72,6 +77,20 @@ public class Repository {
         Utils.writeContents(join(indexFile,fileName),thisFile);
 
 
+    }
+
+    public static void commitFunction(String commitMessage){
+        Commit lastCommit = Utils.readObject(join(GITLET_DIR,"HEAD"),Commit.class);
+        Commit nowCommit = new Commit(commitMessage);
+        nowCommit.commitFile = lastCommit.commitFile;
+        File indexFile = join(GITLET_DIR,"index");
+        List<String> fileName = Utils.plainFilenamesIn(indexFile);
+        if (fileName == null) {
+            return;
+        }
+        for(String nowFile : fileName){
+            File nowFileDirect = join(indexFile,nowFile);
+        }
     }
 
 }

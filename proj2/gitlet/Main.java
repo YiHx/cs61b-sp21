@@ -37,7 +37,24 @@ public class Main {
                     System.out.println("Not in an initialized Gitlet directory.");
                     System.exit(0);
                 }
+                Repository.addFunction(args[1]);
                 break;
+            case "commit":
+                if (args.length == 0) {
+                    System.out.println("Please enter a command.");
+                    System.exit(0);
+                }
+                if(args.length > 2 ){
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
+                }
+                if(!Repository.GITLET_DIR.exists()){
+                    System.out.println("Not in an initialized Gitlet directory.");
+                    System.exit(0);
+                }
+                Repository.commitFunction(args[1]);
+                break;
+
             // TODO: FILL THE REST IN
         }
     }
