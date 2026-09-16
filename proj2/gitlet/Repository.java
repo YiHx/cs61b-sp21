@@ -137,7 +137,14 @@ public class Repository {
             System.out.println("No reason to remove the file.");
             System.exit(0);
         }
+//        如果当前文件被放到了暂存区，则从暂存区移除
+        File thisFile = join(indexFile ,fileName);
+        if(thisFile.exists()){
+            thisFile.delete();
+        }
+        if(lastCommit.commitFile.containsKey(fileName)){
 
+        }
 
     }
 }
