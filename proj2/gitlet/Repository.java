@@ -95,7 +95,9 @@ public class Repository {
 
     public static void commitFunction(String commitMessage){
 //        提取上一个提交并且新建当前的提交
-        Commit lastCommit = Utils.readObject(join(GITLET_DIR,"HEAD"),Commit.class);
+        String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+        File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
+        Commit lastCommit = Utils.readObject(commitFile, Commit.class);
         Commit nowCommit = new Commit(commitMessage);
 
 //        将上一个提交中追踪的文件暂时全部都复制到当前的这个提交内，
@@ -112,8 +114,14 @@ public class Repository {
                 nowCommit.commitFile.put(nowFile,nowFileShaString);
                 File BlobFile = join (GITLET_DIR,"objects","Blobs",nowFileShaString);
                 Utils.writeContents(BlobFile,Utils.readContents(nowFileDirect));
-                Utils.restrictedDelete(nowFileDirect);
+                nowFileDirect.delete();
         }
+        File nowFile = join(GITLET_DIR,"objects","commits");
+        String nowSha1String = Utils.sha1(Utils.serialize(nowCommit));
+        Utils.writeObject(join(nowFile,nowSha1String), nowCommit);
+        head =nowSha1String;
+        File headFile =  join (GITLET_DIR,"HEAD");
+        Utils.writeContents(headFile,head);
     }
 
 }
