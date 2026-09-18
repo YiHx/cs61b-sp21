@@ -189,8 +189,17 @@ public class Repository {
             lastCommitSha1 = lastCommit.parents[0];
             commitFile = join(GITLET_DIR,"objects","commits",lastCommitSha1);
             lastCommit = Utils.readObject(commitFile,Commit.class);
-
-
         }
+        System.out.println("===");
+        System.out.print("commit");
+        System.out.print(" ");
+        System.out.println(lastCommitSha1);
+        if (!Objects.equals(lastCommit.parents[1], "0")) {
+            System.out.printf("Merge: %s %s\n",
+                    lastCommit.parents[0].substring(0, 7),
+                    lastCommit.parents[1].substring(0, 7));
+        }
+        System.out.printf("Date: %s\n", lastCommit.date);
+        System.out.println(lastCommit.message);
     }
 }

@@ -40,10 +40,6 @@ public class Main {
                 Repository.addFunction(args[1]);
                 break;
             case "commit":
-                if (args.length == 0) {
-                    System.out.println("Please enter a command.");
-                    System.exit(0);
-                }
                 if(args.length > 2 ){
                     System.out.println("Incorrect operands.");
                     System.exit(0);
@@ -55,10 +51,6 @@ public class Main {
                 Repository.commitFunction(args[1]);
                 break;
             case "rm":
-                if(args.length==0){
-                    System.out.println("Please enter a command.");
-                    System.exit(0);
-                }
                 if(args.length > 2){
                     System.out.println("Incorrect operands.");
                     System.exit(0);
@@ -70,10 +62,6 @@ public class Main {
                 Repository.removeFunction(args[1]);
                 break;
             case "log":
-                if(args.length ==0){
-                    System.out.println("Please enter a command.");
-                    System.exit(0);
-                }
                 if(args.length > 1){
                     System.out.println("Incorrect operands.");
                     System.exit(0);
