@@ -55,6 +55,8 @@ public class Repository {
             File indexFile = join(GITLET_DIR, "index");
             File blobs = join(GITLET_DIR, "objects", "Blobs");
             File indexStage = join(GITLET_DIR, "stage");
+            File branch = join(GITLET_DIR,"branch");
+            branch.mkdir();
             indexStage.mkdir();
             blobs.mkdirs();
             indexFile.mkdir();
@@ -64,6 +66,8 @@ public class Repository {
             Utils.writeObject(join(nowFile, nowSha1String), nowCommit);
             head = nowSha1String;
             File headFile = join(GITLET_DIR, "HEAD");
+            File thisbranch = join(GITLET_DIR,"branch",nowSha1String);
+            Utils.writeObject(thisbranch,Utils.serialize(nowCommit));
             Utils.writeContents(headFile, head);
 
         } else {
@@ -139,6 +143,15 @@ public class Repository {
         String nowSha1String = Utils.sha1(Utils.serialize(nowCommit));
         Utils.writeObject(join(nowFile, nowSha1String), nowCommit);
         head = nowSha1String;
+        List<String> allBranch = Utils.plainFilenamesIn(join(GITLET_DIR,"branch"));
+        for(String nowBranch : allBranch){
+            if(nowBranch.equals(Utils.readContentsAsString(join(GITLET_DIR,"HEAD")))){
+                File thisBranch = join(GITLET_DIR,"branch",nowBranch);
+                thisBranch.delete();
+                File newBranchHead = join(GITLET_DIR,"branch",nowSha1String);
+                Utils.writeObject(newBranchHead,Utils.serialize(nowCommit));
+            }
+        }
         File headFile = join(GITLET_DIR, "HEAD");
         Utils.writeContents(headFile, head);
     }
@@ -241,6 +254,11 @@ public class Repository {
         if(!check){
             System.out.println("Found no commit with that message.");
         }
+    }
+
+
+    public static void statusFunction(){
+
     }
 
 }
