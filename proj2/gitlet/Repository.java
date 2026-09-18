@@ -172,17 +172,25 @@ public class Repository {
         String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
         File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
         Commit lastCommit = Utils.readObject(commitFile, Commit.class);
-        System.out.println("===");
-        System.out.print("commit");
-        System.out.println();
-        System.out.println(lastCommitSha1);
-        if(!Objects.equals(lastCommit.parents[1], "0")){
-            System.out.printf("Merge: %s %s\n",
-                    lastCommit.parents[0].substring(0, 7),
-                    lastCommit.parents[1].substring(0, 7));
-        }
-        System.out.printf("Date:%s\n",lastCommit.date);
-        System.out.println(lastCommit.message);
+//        在没有到达第一个提交之前，打印出当前提交的信息
+        while (!lastCommit.parents[0].equals("0")) {
+            System.out.println("===");
+            System.out.print("commit");
+            System.out.print(" ");
+            System.out.println(lastCommitSha1);
+            if (!Objects.equals(lastCommit.parents[1], "0")) {
+                System.out.printf("Merge: %s %s\n",
+                        lastCommit.parents[0].substring(0, 7),
+                        lastCommit.parents[1].substring(0, 7));
+            }
+            System.out.printf("Date: %s\n", lastCommit.date);
+            System.out.println(lastCommit.message);
+//            来到当前提交的上一个提交
+            lastCommitSha1 = lastCommit.parents[0];
+            commitFile = join(GITLET_DIR,"objects","commits",lastCommitSha1);
+            lastCommit = Utils.readObject(commitFile,Commit.class);
 
+
+        }
     }
 }
