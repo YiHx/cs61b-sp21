@@ -72,6 +72,17 @@ public class Main {
                 }
                 Repository.logFunction();
                 break;
+            case "global-log":
+                if(args.length > 1){
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
+                }
+                if(!Repository.GITLET_DIR.exists()) {
+                    System.out.println("Not in an initialized Gitlet directory.");
+                    System.exit(0);
+                }
+                Repository.globalLogFunction();
+                break;
 
             // TODO: FILL THE REST IN
         }
