@@ -57,7 +57,7 @@ public class Main {
             case "rm":
                 if(args.length==0){
                     System.out.println("Please enter a command.");
-                    System.exit112(0);
+                    System.exit(0);
                 }
                 if(args.length > 2){
                     System.out.println("Incorrect operands.");

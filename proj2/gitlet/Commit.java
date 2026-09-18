@@ -2,12 +2,15 @@ package gitlet;
 
 // TODO: any imports you need here
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 import java.text.SimpleDateFormat;// TODO: You'll likely use this in this class
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import static gitlet.Utils.join;
 
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
@@ -27,8 +30,9 @@ public class Commit implements Serializable {
     /** The message of this Commit. */
     public String message = "initial commit";
     public String date;
-    public String parents;
+    public String[] parents;
     public Map<String, String> commitFile = new HashMap<>();
+    public int commitNumber;
 
 
 
@@ -37,8 +41,8 @@ public class Commit implements Serializable {
     public Commit(){
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
         this.date = sdf.format(new Date(0));
-        this.parents = "0";
-
+        this.parents = new String[]{"0","0"};
+        this.commitNumber =1;
 
     }
 //  其余的提交
@@ -47,7 +51,8 @@ public class Commit implements Serializable {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
         Date date = new Date();
         this.date = sdf.format(date);
-        this.parents = Repository.head;
+        this.parents = new String[]{"0","0"};
+        this.parents[0] = Repository.head;
 
 
     }

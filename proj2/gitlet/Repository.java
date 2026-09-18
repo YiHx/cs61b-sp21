@@ -3,6 +3,7 @@ package gitlet;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static gitlet.Utils.*;
@@ -100,6 +101,7 @@ public class Repository {
         String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
         File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
         Commit lastCommit = Utils.readObject(commitFile, Commit.class);
+        Repository.head = lastCommitSha1;
         Commit nowCommit = new Commit(commitMessage);
 
 //        将上一个提交中追踪的文件暂时全部都复制到当前的这个提交内，
@@ -166,6 +168,21 @@ public class Repository {
 
 
     public static void logFunction() {
+//        提取当前的头提交
+        String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+        File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
+        Commit lastCommit = Utils.readObject(commitFile, Commit.class);
+        System.out.println("===");
+        System.out.print("commit");
+        System.out.println();
+        System.out.println(lastCommitSha1);
+        if(!Objects.equals(lastCommit.parents[1], "0")){
+            System.out.printf("Merge: %s %s\n",
+                    lastCommit.parents[0].substring(0, 7),
+                    lastCommit.parents[1].substring(0, 7));
+        }
+        System.out.printf("Date:%s\n",lastCommit.date);
+        System.out.println(lastCommit.message);
 
     }
 }
