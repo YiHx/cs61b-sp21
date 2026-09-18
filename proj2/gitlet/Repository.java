@@ -163,4 +163,9 @@ public class Repository {
         }
 
     }
+
+
+    public static void logFunction() {
+
+    }
 }

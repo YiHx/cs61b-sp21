@@ -57,7 +57,7 @@ public class Main {
             case "rm":
                 if(args.length==0){
                     System.out.println("Please enter a command.");
-                    System.exit(0);
+                    System.exit112(0);
                 }
                 if(args.length > 2){
                     System.out.println("Incorrect operands.");
@@ -68,6 +68,21 @@ public class Main {
                     System.exit(0);
                 }
                 Repository.removeFunction(args[1]);
+                break;
+            case "log":
+                if(args.length ==0){
+                    System.out.println("Please enter a command.");
+                    System.exit(0);
+                }
+                if(args.length > 1){
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
+                }
+                if(!Repository.GITLET_DIR.exists()){
+                    System.out.println("Not in an initialized Gitlet directory.");
+                    System.exit(0);
+                }
+                Repository.logFunction();
                 break;
 
             // TODO: FILL THE REST IN
