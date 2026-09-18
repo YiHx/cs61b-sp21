@@ -228,4 +228,19 @@ public class Repository {
         }
     }
 
+    public static void findFunction(String message){
+        List<String> nowAllFile = Utils.plainFilenamesIn(Utils.join(GITLET_DIR,"objects","commits"));
+        boolean check =false;
+        for(String nowFile : nowAllFile){
+            Commit  nowFileCommit = Utils.readObject((join(GITLET_DIR,"objects","commits",nowFile)),Commit.class);
+            if(nowFileCommit.message.equals(message)){
+                check = true;
+                System.out.println(nowFile);
+            }
+        }
+        if(!check){
+            System.out.println("Found no commit with that message.");
+        }
+    }
+
 }
