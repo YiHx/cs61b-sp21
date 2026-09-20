@@ -258,7 +258,60 @@ public class Repository {
 
 
     public static void statusFunction(){
+//        把当前所有的分支的每个文件名称全部提取出来
+        List<String> allBranch = Utils.plainFilenamesIn(join(GITLET_DIR,"branch"));
+//        找到当前head的追踪提交
+        String headCommitSha1 = Utils.readContentsAsString(join(Repository.GITLET_DIR, "HEAD"));
+        File commitFile = join(Repository.GITLET_DIR, "objects", "commits", headCommitSha1);
+        Commit headCommit = Utils.readObject(commitFile, Commit.class);
+//        遍历当前的所有分支，然后打印出来
+        System.out.println("=== Branches ===");
+        for(String thisBranch : allBranch){
+            File nowBranch = join(GITLET_DIR,"branch",thisBranch);
+            Commit nowBranchCommit = Utils.readObject(nowBranch,Commit.class);
+            if(Objects.equals(nowBranchCommit.branch, headCommit.branch)){
+                if(Objects.equals(headCommit.branch, "master")){
+                    System.out.println("*master");
+                    continue;
+                }else{
+                    System.out.println('*'+headCommit.branch);
+                    continue;
+                }
+            }
+            System.out.println(nowBranchCommit.branch);
+        }
+        System.out.println();
 
+//        打印出当前被暂存的所有文件
+        System.out.println("=== Staged Files ===");
+        List<String> allIndexFile = Utils.plainFilenamesIn(join(GITLET_DIR,"index"));
+        if (allIndexFile != null && !allIndexFile.isEmpty()) {
+            for(String thisIndexFile : allIndexFile){
+                    System.out.println(thisIndexFile);
+            }
+        }
+        System.out.println();
+
+//        打印出当前被记录等待下次被删除的文件
+        System.out.println("=== Removed Files ===");
+        List<String> allStageFile = Utils.plainFilenamesIn(join(GITLET_DIR,"stage"));
+        if(!allStageFile.isEmpty()){
+            for(String nowStageFile : allStageFile ){
+                System.out.println(nowStageFile);
+            }
+        }
+        System.out.println();
+
+//        打印已经被修改但是没有被暂存的文件
+        System.out.println("=== Modifications Not Staged For Commit ===");
+//        ####################待做#########################
+        System.out.println();
+
+//        打印没有被追踪的文件
+        System.out.println("=== Untracked Files ===");
+//        #####################待做########################
+        System.out.println();
     }
+
 
 }

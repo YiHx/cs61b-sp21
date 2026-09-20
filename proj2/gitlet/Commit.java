@@ -33,6 +33,7 @@ public class Commit implements Serializable {
     public String[] parents;
     public Map<String, String> commitFile = new HashMap<>();
     public int commitNumber;
+    public String branch;
 
 
 
@@ -43,6 +44,7 @@ public class Commit implements Serializable {
         this.date = sdf.format(new Date(0));
         this.parents = new String[]{"0","0"};
         this.commitNumber =1;
+        this.branch = "master";
 
     }
 //  其余的提交
@@ -54,6 +56,11 @@ public class Commit implements Serializable {
         this.parents = new String[]{"0","0"};
         this.parents[0] = Repository.head;
 
+        String lastCommitSha1 = Utils.readContentsAsString(join(Repository.GITLET_DIR, "HEAD"));
+        File commitFile = join(Repository.GITLET_DIR, "objects", "commits", lastCommitSha1);
+        Commit lastCommit = Utils.readObject(commitFile, Commit.class);
+
+        this.branch  = lastCommit.branch;
 
     }
 }
