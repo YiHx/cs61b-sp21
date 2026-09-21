@@ -66,8 +66,8 @@ public class Repository {
             Utils.writeObject(join(nowFile, nowSha1String), nowCommit);
             head = nowSha1String;
             File headFile = join(GITLET_DIR, "HEAD");
-            File thisbranch = join(GITLET_DIR,"branch",nowSha1String);
-            Utils.writeObject(thisbranch,Utils.serialize(nowCommit));
+            File thisBranch = join(GITLET_DIR,"branch","master");
+            Utils.writeContents(thisBranch,nowSha1String);
             Utils.writeContents(headFile, head);
 
         } else {
@@ -153,6 +153,8 @@ public class Repository {
             }
         }
         File headFile = join(GITLET_DIR, "HEAD");
+        File nowBranch = join(GITLET_DIR,"branch","master");
+        Utils.writeContents(nowBranch,nowSha1String);
         Utils.writeContents(headFile, head);
     }
 
@@ -262,23 +264,15 @@ public class Repository {
         List<String> allBranch = Utils.plainFilenamesIn(join(GITLET_DIR,"branch"));
 //        找到当前head的追踪提交
         String headCommitSha1 = Utils.readContentsAsString(join(Repository.GITLET_DIR, "HEAD"));
-        File commitFile = join(Repository.GITLET_DIR, "objects", "commits", headCommitSha1);
-        Commit headCommit = Utils.readObject(commitFile, Commit.class);
 //        遍历当前的所有分支，然后打印出来
         System.out.println("=== Branches ===");
         for(String thisBranch : allBranch){
-            File nowBranch = join(GITLET_DIR,"branch",thisBranch);
-            Commit nowBranchCommit = Utils.readObject(nowBranch,Commit.class);
-            if(Objects.equals(nowBranchCommit.branch, headCommit.branch)){
-                if(Objects.equals(headCommit.branch, "master")){
-                    System.out.println("*master");
-                    continue;
-                }else{
-                    System.out.println('*'+headCommit.branch);
-                    continue;
-                }
+            String nowBranchSha1 = Utils.readContentsAsString(join(Repository.GITLET_DIR,"branch",thisBranch));
+            if(nowBranchSha1.equals(headCommitSha1)){
+                System.out.println('*'+thisBranch);
+            }else {
+                System.out.println(thisBranch);
             }
-            System.out.println(nowBranchCommit.branch);
         }
         System.out.println();
 
