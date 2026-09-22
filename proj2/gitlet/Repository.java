@@ -270,9 +270,10 @@ public class Repository {
             String nowBranchSha1 = Utils.readContentsAsString(join(Repository.GITLET_DIR,"branch",thisBranch));
             if(nowBranchSha1.equals(headCommitSha1)){
                 System.out.println('*'+thisBranch);
-            }else {
-                System.out.println(thisBranch);
+                continue;
             }
+                System.out.println(thisBranch);
+
         }
         System.out.println();
 
@@ -305,6 +306,12 @@ public class Repository {
         System.out.println("=== Untracked Files ===");
 //        #####################待做########################
         System.out.println();
+    }
+
+    public static  void checkoutFunction(String[] args) {
+        if(args.length == 2){
+            
+        }
     }
 
 

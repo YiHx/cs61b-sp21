@@ -105,6 +105,16 @@ public class Main {
                 }
                 Repository.statusFunction();
                 break;
+            case "checkout":
+                if(args.length==1||args.length>4){
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
+                }
+                if(!Repository.GITLET_DIR.exists()) {
+                    System.out.println("Not in an initialized Gitlet directory.");
+                    System.exit(0);
+                }
+                Repository.checkoutFunction(args);
 
             // TODO: FILL THE REST IN
         }
