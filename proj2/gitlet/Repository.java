@@ -292,7 +292,7 @@ public class Repository {
         List<String> allStageFile = Utils.plainFilenamesIn(join(GITLET_DIR,"stage"));
         if(!allStageFile.isEmpty()){
             for(String nowStageFile : allStageFile ){
-                System.out.println(nowStageFile);
+                    System.out.println(nowStageFile);
             }
         }
         System.out.println();
@@ -309,47 +309,103 @@ public class Repository {
     }
 
     public static  void checkoutFunction(String[] args) {
-        if(args.length == 3){
-            if(!Objects.equals(args[1], "--")){
+        if (args.length == 3) {
+            if (!Objects.equals(args[1], "--")) {
                 System.out.println("Incorrect operands.");
                 System.exit(0);
             }
             String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
             File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
             Commit lastCommit = Utils.readObject(commitFile, Commit.class);
-            if(!lastCommit.commitFile.containsKey(args[2])){
+            if (!lastCommit.commitFile.containsKey(args[2])) {
                 System.out.println("File does not exist in that commit.");
                 System.exit(0);
             }
-            File thisFile = join(GITLET_DIR,"objects",lastCommit.commitFile.get(args[2]));
-            File theChangeFile = join(CWD,args[2]);
-            Utils.writeContents(theChangeFile,Utils.readContents(thisFile));
+            File thisFile = join(GITLET_DIR, "objects", lastCommit.commitFile.get(args[2]));
+            File theChangeFile = join(CWD, args[2]);
+            Utils.writeContents(theChangeFile, Utils.readContents(thisFile));
         }
 
-        if(args.length == 4){
+        if (args.length == 4) {
             String thisFileName = args[3];
             String thisCommitSha1 = args[1];
-            File lastCommitFold = join(GITLET_DIR,"objects","commits",thisCommitSha1);
-            if(!lastCommitFold.exists()){
+            File lastCommitFold = join(GITLET_DIR, "objects", "commits", thisCommitSha1);
+            if (!lastCommitFold.exists()) {
                 System.out.println("No commit with that id exists.");
                 System.exit(0);
             }
-            Commit lastCommit = Utils.readObject(lastCommitFold,Commit.class);
-            if(!lastCommit.commitFile.containsKey(thisFileName)){
+            Commit lastCommit = Utils.readObject(lastCommitFold, Commit.class);
+            if (!lastCommit.commitFile.containsKey(thisFileName)) {
                 System.out.println("File does not exist in that commit.");
                 System.exit(0);
             }
-            File thisFile = join(GITLET_DIR,"objects",lastCommit.commitFile.get(thisFileName));
-            File thisChangeFile = join(CWD,thisFileName);
-            Utils.writeContents(thisChangeFile,Utils.readContents(thisFile));
+            File thisFile = join(GITLET_DIR, "objects", lastCommit.commitFile.get(thisFileName));
+            File thisChangeFile = join(CWD, thisFileName);
+            Utils.writeContents(thisChangeFile, Utils.readContents(thisFile));
 
         }
-        if(args.length == 2){
+        if (args.length == 2) {
             String willChangeBranch = args[1];
-            List<String> allBranch = Utils.plainFilenamesIn(join(GITLET_DIR,'branch'));
-            if(allBranch.c)
+            List<String> allBranch = Utils.plainFilenamesIn(join(GITLET_DIR, "branch"));
+
+            String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+
+            if (!allBranch.contains(willChangeBranch)) {
+                System.out.println("No such branch exists.");
+                System.exit(0);
+            }
+
+            String willChangeBranchSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", willChangeBranch));
+            if (willChangeBranchSha1.equals(lastCommitSha1)) {
+                System.out.println("No need to checkout the current branch.");
+                System.exit(0);
+
+
+//            检查是否存在文件没有被当前分支跟踪，并且会被当前切换分支的操作所覆盖
+                Commit otherBranch = Utils.readObject(join(GITLET_DIR, "objects", "commits", willChangeBranchSha1), Commit.class);
+
+                List<String> nowAllFile = Utils.plainFilenamesIn(join(CWD));
+
+                for (String now : nowAllFile) {
+                    if (otherBranch.commitFile.containsKey(now)) {
+                        File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
+//                    头提交所跟踪的文件
+                        Commit lastCommit = Utils.readObject(commitFile, Commit.class);
+//                    将要删除的文件
+                        List<String> willDeleteFile = Utils.plainFilenamesIn(join(GITLET_DIR, "stage"));
+                        if (!willDeleteFile.contains(now) && !lastCommit.commitFile.containsKey(now)) {
+                            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                            System.exit(0);
+                        }
+                    }
+                }
+
+                for (var it : otherBranch.commitFile.entrySet()) {
+                    File thisFile = join(CWD, it.getKey());
+                    Utils.writeContents(thisFile, Utils.readContents(join(GITLET_DIR, "objects", "blobs", it.getValue())));
+                }
+                File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
+                Commit lastCommit = Utils.readObject(commitFile, Commit.class);
+                for (String currentFile : lastCommit.commitFile.keySet()) {
+                    if (!otherBranch.commitFile.containsKey(currentFile)) {
+                        Utils.restrictedDelete(join(CWD, currentFile));
+                    }
+                }
+
+                File headFile = join(GITLET_DIR, "HEAD");
+                Utils.writeContents(headFile, willChangeBranchSha1);
+                File deleteFile = join(GITLET_DIR, "stage");
+                for (File file : deleteFile.listFiles()) {
+                    file.delete();
+                }
+                File indexFile = join(GITLET_DIR, "index");
+
+                for (File file : indexFile.listFiles()) {
+                    file.delete();
+                }
+
+            }
         }
+
     }
-
-
 }
