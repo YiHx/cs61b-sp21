@@ -328,8 +328,26 @@ public class Repository {
 
         if(args.length == 4){
             String thisFileName = args[3];
-            String thisCommit = args[1];
+            String thisCommitSha1 = args[1];
+            File lastCommitFold = join(GITLET_DIR,"objects","commits",thisCommitSha1);
+            if(!lastCommitFold.exists()){
+                System.out.println("No commit with that id exists.");
+                System.exit(0);
+            }
+            Commit lastCommit = Utils.readObject(lastCommitFold,Commit.class);
+            if(!lastCommit.commitFile.containsKey(thisFileName)){
+                System.out.println("File does not exist in that commit.");
+                System.exit(0);
+            }
+            File thisFile = join(GITLET_DIR,"objects",lastCommit.commitFile.get(thisFileName));
+            File thisChangeFile = join(CWD,thisFileName);
+            Utils.writeContents(thisChangeFile,Utils.readContents(thisFile));
 
+        }
+        if(args.length == 2){
+            String willChangeBranch = args[1];
+            List<String> allBranch = Utils.plainFilenamesIn(join(GITLET_DIR,'branch'));
+            if(allBranch.c)
         }
     }
 
