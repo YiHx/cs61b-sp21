@@ -309,8 +309,27 @@ public class Repository {
     }
 
     public static  void checkoutFunction(String[] args) {
-        if(args.length == 2){
-            
+        if(args.length == 3){
+            if(!Objects.equals(args[1], "--")){
+                System.out.println("Incorrect operands.");
+                System.exit(0);
+            }
+            String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+            File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
+            Commit lastCommit = Utils.readObject(commitFile, Commit.class);
+            if(!lastCommit.commitFile.containsKey(args[2])){
+                System.out.println("File does not exist in that commit.");
+                System.exit(0);
+            }
+            File thisFile = join(GITLET_DIR,"objects",lastCommit.commitFile.get(args[2]));
+            File theChangeFile = join(CWD,args[2]);
+            Utils.writeContents(theChangeFile,Utils.readContents(thisFile));
+        }
+
+        if(args.length == 4){
+            String thisFileName = args[3];
+            String thisCommit = args[1];
+
         }
     }
 
