@@ -6,23 +6,12 @@ import java.util.Objects;
 
 import static gitlet.Utils.*;
 
-// TODO: any imports you need here
-
 /**
  * Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
  *
  * @author xuanh08
  */
 public class Repository {
-    /**
-     * TODO: add instance variables here.
-     * <p>
-     * List all instance variables of the Repository class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided two examples for you.
-     */
 
     public static String head;
 
@@ -35,17 +24,13 @@ public class Repository {
      */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
-    /* TODO: fill in the rest of this class. */
     public Repository() {
-
     }
 
     public void initFunction() {
-//        判断.gitlet目录是否存在，如果不存在则创建
         if (!GITLET_DIR.exists()) {
             GITLET_DIR.mkdir();
             File nowFile = join(GITLET_DIR, "objects", "commits");
-//            判断commits目录是否存在，如果不存在则创建
             if (!nowFile.exists()) {
                 nowFile.mkdirs();
             }
@@ -54,35 +39,35 @@ public class Repository {
             File blobs = join(GITLET_DIR, "objects", "Blobs");
             File indexStage = join(GITLET_DIR, "stage");
             File branch = join(GITLET_DIR,"branch");
+
             branch.mkdir();
             indexStage.mkdir();
             blobs.mkdirs();
             indexFile.mkdir();
-//            检查完毕创建一个新的提交，此时没有跟踪任何文件
+
             Commit nowCommit = new gitlet.Commit();
             String nowSha1String = Utils.sha1(Utils.serialize(nowCommit));
             Utils.writeObject(join(nowFile, nowSha1String), nowCommit);
             head = nowSha1String;
-            File headFile = join(GITLET_DIR, "HEAD");
+
             File thisBranch = join(GITLET_DIR,"branch","master");
-            Utils.writeContents(thisBranch,nowSha1String);
-            Utils.writeContents(headFile, head);
+            Utils.writeContents(thisBranch, nowSha1String);
+
+            File headFile = join(GITLET_DIR, "HEAD");
+            Utils.writeContents(headFile, "master");
 
         } else {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);
         }
-
     }
 
     public static void addFunction(String fileName) {
-//        判断当前文件是否存在
         File directFile = join(CWD, fileName);
         if (!directFile.exists()) {
             System.out.println("File does not exist.");
             System.exit(0);
         }
-//        将当前目录的文件放入暂存区
         File indexFile = join(GITLET_DIR, "index");
         File BlobsFile = join(GITLET_DIR, "objects", "Blobs");
         List<String> alreadyFile = Utils.plainFilenamesIn(BlobsFile);
@@ -99,20 +84,17 @@ public class Repository {
         }
         byte[] thisFile = Utils.readContents(directFile);
         Utils.writeContents(join(indexFile, fileName), thisFile);
-
-
     }
 
     public static void commitFunction(String commitMessage) {
-//        提取上一个提交并且新建当前的提交
-        String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+        String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+        String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
+
         File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
         Commit lastCommit = Utils.readObject(commitFile, Commit.class);
         Repository.head = lastCommitSha1;
         Commit nowCommit = new Commit(commitMessage);
 
-//        将上一个提交中追踪的文件暂时全部都复制到当前的这个提交内，
-//        然后将暂存区里的文件一个一个更新到当前的提交的文件映射的map
         nowCommit.commitFile = lastCommit.commitFile;
         File indexFile = join(GITLET_DIR, "index");
         List<String> fileName = Utils.plainFilenamesIn(indexFile);
@@ -141,39 +123,28 @@ public class Repository {
         String nowSha1String = Utils.sha1(Utils.serialize(nowCommit));
         Utils.writeObject(join(nowFile, nowSha1String), nowCommit);
         head = nowSha1String;
-        List<String> allBranch = Utils.plainFilenamesIn(join(GITLET_DIR,"branch"));
-        for(String nowBranch : allBranch){
-            if(nowBranch.equals(Utils.readContentsAsString(join(GITLET_DIR,"HEAD")))){
-                File thisBranch = join(GITLET_DIR,"branch",nowBranch);
-                thisBranch.delete();
-                File newBranchHead = join(GITLET_DIR,"branch",nowSha1String);
-                Utils.writeObject(newBranchHead,Utils.serialize(nowCommit));
-            }
-        }
-        File headFile = join(GITLET_DIR, "HEAD");
-        File nowBranch = join(GITLET_DIR,"branch","master");
-        Utils.writeContents(nowBranch,nowSha1String);
-        Utils.writeContents(headFile, head);
+
+        File currentBranchFile = join(GITLET_DIR, "branch", currentBranch);
+        Utils.writeContents(currentBranchFile, nowSha1String);
     }
 
     public static void removeFunction(String fileName) {
         File indexFile = join(GITLET_DIR, "index");
-//        提取上一个提交
-        String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+
+        String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+        String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
+
         File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
         Commit lastCommit = Utils.readObject(commitFile, Commit.class);
-//        判断是否当前要删除的文件是否在暂存区或者被上一个提交跟踪
+
         if ((!join(indexFile, fileName).exists()) && !lastCommit.commitFile.containsKey(fileName)) {
             System.out.println("No reason to remove the file.");
             System.exit(0);
         }
-//        如果当前文件被放到了暂存区，则从暂存区移除
         File thisFile = join(indexFile, fileName);
         if (thisFile.exists()) {
             thisFile.delete();
         }
-//        如果当前的文件被当前的头提交跟踪了，那么把这个文件添加到将要删除的区域，在下一个提交的时候把这个文件删除，
-//        同时把用户当前工作目录的这个文件删除
         if (lastCommit.commitFile.containsKey(fileName)) {
             File stageFile = join(GITLET_DIR, "stage", fileName);
             File thisBlobFile = join(GITLET_DIR, "objects", "Blobs", lastCommit.commitFile.get(fileName));
@@ -181,16 +152,15 @@ public class Repository {
             File userFile = join(CWD, fileName);
             userFile.delete();
         }
-
     }
 
-
     public static void logFunction() {
-//        提取当前的头提交
-        String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+        String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+        String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
+
         File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
         Commit lastCommit = Utils.readObject(commitFile, Commit.class);
-//        在没有到达第一个提交之前，打印出当前提交的信息
+
         while (!lastCommit.parents[0].equals("0")) {
             System.out.println("===");
             System.out.print("commit");
@@ -203,7 +173,6 @@ public class Repository {
             }
             System.out.printf("Date: %s\n", lastCommit.date);
             System.out.println(lastCommit.message);
-//            来到当前提交的上一个提交
             lastCommitSha1 = lastCommit.parents[0];
             commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
             lastCommit = Utils.readObject(commitFile, Commit.class);
@@ -221,7 +190,6 @@ public class Repository {
         System.out.println(lastCommit.message);
     }
 
-
     public static void globalLogFunction() {
         List<String> nowAllFile = Utils.plainFilenamesIn(Utils.join(GITLET_DIR,"objects","commits"));
         for(String nowFile : nowAllFile){
@@ -237,7 +205,6 @@ public class Repository {
             }
             System.out.printf("Date: %s\n", nowFileCommit.date);
             System.out.println(nowFileCommit.message);
-
         }
     }
 
@@ -245,7 +212,7 @@ public class Repository {
         List<String> nowAllFile = Utils.plainFilenamesIn(Utils.join(GITLET_DIR,"objects","commits"));
         boolean check =false;
         for(String nowFile : nowAllFile){
-            Commit  nowFileCommit = Utils.readObject((join(GITLET_DIR,"objects","commits",nowFile)),Commit.class);
+            Commit nowFileCommit = Utils.readObject((join(GITLET_DIR,"objects","commits",nowFile)),Commit.class);
             if(nowFileCommit.message.equals(message)){
                 check = true;
                 System.out.println(nowFile);
@@ -256,63 +223,56 @@ public class Repository {
         }
     }
 
-
     public static void statusFunction(){
-//        把当前所有的分支的每个文件名称全部提取出来
         List<String> allBranch = Utils.plainFilenamesIn(join(GITLET_DIR,"branch"));
-//        找到当前head的追踪提交
-        String headCommitSha1 = Utils.readContentsAsString(join(Repository.GITLET_DIR, "HEAD"));
-//        遍历当前的所有分支，然后打印出来
+
+        String currentBranch = Utils.readContentsAsString(join(Repository.GITLET_DIR, "HEAD"));
+
         System.out.println("=== Branches ===");
         for(String thisBranch : allBranch){
-            String nowBranchSha1 = Utils.readContentsAsString(join(Repository.GITLET_DIR,"branch",thisBranch));
-            if(nowBranchSha1.equals(headCommitSha1)){
-                System.out.println('*'+thisBranch);
+            if(thisBranch.equals(currentBranch)){
+                System.out.println('*' + thisBranch);
                 continue;
             }
-                System.out.println(thisBranch);
-
+            System.out.println(thisBranch);
         }
         System.out.println();
 
-//        打印出当前被暂存的所有文件
         System.out.println("=== Staged Files ===");
         List<String> allIndexFile = Utils.plainFilenamesIn(join(GITLET_DIR,"index"));
         if (allIndexFile != null && !allIndexFile.isEmpty()) {
             for(String thisIndexFile : allIndexFile){
-                    System.out.println(thisIndexFile);
+                System.out.println(thisIndexFile);
             }
         }
         System.out.println();
 
-//        打印出当前被记录等待下次被删除的文件
         System.out.println("=== Removed Files ===");
         List<String> allStageFile = Utils.plainFilenamesIn(join(GITLET_DIR,"stage"));
         if(!allStageFile.isEmpty()){
             for(String nowStageFile : allStageFile ){
-                    System.out.println(nowStageFile);
+                System.out.println(nowStageFile);
             }
         }
         System.out.println();
 
-//        打印已经被修改但是没有被暂存的文件
         System.out.println("=== Modifications Not Staged For Commit ===");
-//        ####################待做#########################
         System.out.println();
 
-//        打印没有被追踪的文件
         System.out.println("=== Untracked Files ===");
-//        #####################待做########################
         System.out.println();
     }
 
-    public static  void checkoutFunction(String[] args) {
+    public static void checkoutFunction(String[] args) {
         if (args.length == 3) {
             if (!Objects.equals(args[1], "--")) {
                 System.out.println("Incorrect operands.");
                 System.exit(0);
             }
-            String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+            // [MODIFIED]: 解析HEAD
+            String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+            String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
+
             File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
             Commit lastCommit = Utils.readObject(commitFile, Commit.class);
             if (!lastCommit.commitFile.containsKey(args[2])) {
@@ -342,83 +302,86 @@ public class Repository {
             Utils.writeContents(thisChangeFile, Utils.readContents(thisFile));
 
         }
+
         if (args.length == 2) {
             String willChangeBranch = args[1];
             List<String> allBranch = Utils.plainFilenamesIn(join(GITLET_DIR, "branch"));
 
-            String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+            // [MODIFIED]: 解析当前HEAD对应的分支名和哈希值
+            String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+            String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
 
             if (!allBranch.contains(willChangeBranch)) {
                 System.out.println("No such branch exists.");
                 System.exit(0);
             }
 
-            String willChangeBranchSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", willChangeBranch));
-            if (willChangeBranchSha1.equals(lastCommitSha1)) {
+
+            if (willChangeBranch.equals(currentBranch)) {
                 System.out.println("No need to checkout the current branch.");
                 System.exit(0);
+            }
 
+            String willChangeBranchSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", willChangeBranch));
+            Commit otherBranch = Utils.readObject(join(GITLET_DIR, "objects", "commits", willChangeBranchSha1), Commit.class);
+            List<String> nowAllFile = Utils.plainFilenamesIn(join(CWD));
 
-//            检查是否存在文件没有被当前分支跟踪，并且会被当前切换分支的操作所覆盖
-                Commit otherBranch = Utils.readObject(join(GITLET_DIR, "objects", "commits", willChangeBranchSha1), Commit.class);
-
-                List<String> nowAllFile = Utils.plainFilenamesIn(join(CWD));
-
-                for (String now : nowAllFile) {
-                    if (otherBranch.commitFile.containsKey(now)) {
-                        File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
-//                    头提交所跟踪的文件
-                        Commit lastCommit = Utils.readObject(commitFile, Commit.class);
-//                    将要删除的文件
-                        List<String> willDeleteFile = Utils.plainFilenamesIn(join(GITLET_DIR, "stage"));
-                        if (!willDeleteFile.contains(now) && !lastCommit.commitFile.containsKey(now)) {
-                            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                            System.exit(0);
-                        }
+            for (String now : nowAllFile) {
+                if (otherBranch.commitFile.containsKey(now)) {
+                    File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
+                    Commit lastCommit = Utils.readObject(commitFile, Commit.class);
+                    List<String> willDeleteFile = Utils.plainFilenamesIn(join(GITLET_DIR, "stage"));
+                    if (!willDeleteFile.contains(now) && !lastCommit.commitFile.containsKey(now)) {
+                        System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                        System.exit(0);
                     }
                 }
+            }
 
-                for (var it : otherBranch.commitFile.entrySet()) {
-                    File thisFile = join(CWD, it.getKey());
-                    Utils.writeContents(thisFile, Utils.readContents(join(GITLET_DIR, "objects", "blobs", it.getValue())));
+            for (var it : otherBranch.commitFile.entrySet()) {
+                File thisFile = join(CWD, it.getKey());
+                Utils.writeContents(thisFile, Utils.readContents(join(GITLET_DIR, "objects", "blobs", it.getValue())));
+            }
+            File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
+            Commit lastCommit = Utils.readObject(commitFile, Commit.class);
+            for (String currentFile : lastCommit.commitFile.keySet()) {
+                if (!otherBranch.commitFile.containsKey(currentFile)) {
+                    Utils.restrictedDelete(join(CWD, currentFile));
                 }
-                File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
-                Commit lastCommit = Utils.readObject(commitFile, Commit.class);
-                for (String currentFile : lastCommit.commitFile.keySet()) {
-                    if (!otherBranch.commitFile.containsKey(currentFile)) {
-                        Utils.restrictedDelete(join(CWD, currentFile));
-                    }
-                }
+            }
 
-                File headFile = join(GITLET_DIR, "HEAD");
-                Utils.writeContents(headFile, willChangeBranchSha1);
-                File deleteFile = join(GITLET_DIR, "stage");
-                for (File file : deleteFile.listFiles()) {
+            File headFile = join(GITLET_DIR, "HEAD");
+            Utils.writeContents(headFile, willChangeBranch);
+
+            File deleteFile = join(GITLET_DIR, "stage");
+            File[] stageFiles = deleteFile.listFiles();
+            if (stageFiles != null) {
+                for (File file : stageFiles) {
                     file.delete();
                 }
-                File indexFile = join(GITLET_DIR, "index");
+            }
 
-                for (File file : indexFile.listFiles()) {
+            File indexFile = join(GITLET_DIR, "index");
+            File[] idxFiles = indexFile.listFiles();
+            if (idxFiles != null) {
+                for (File file : idxFiles) {
                     file.delete();
                 }
-
             }
         }
-
     }
 
     public static void branchFunction(String branch){
         File newBranch = join(GITLET_DIR, "branch", branch);
-
 
         if (newBranch.exists()) {
             System.out.print("A branch with that name already exists.");
             return;
         }
 
-
-        String currentCommitHash = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+        // [MODIFIED]: 通过 HEAD 拿到当前分支，再拿到当前的 commit 哈希，赋给新分支
+        String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+        String currentCommitHash = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
         Utils.writeContents(newBranch, currentCommitHash);
-
     }
 }
