@@ -269,7 +269,7 @@ public class Repository {
                 System.out.println("Incorrect operands.");
                 System.exit(0);
             }
-            // [MODIFIED]: 解析HEAD
+
             String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
             String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
 
@@ -307,7 +307,7 @@ public class Repository {
             String willChangeBranch = args[1];
             List<String> allBranch = Utils.plainFilenamesIn(join(GITLET_DIR, "branch"));
 
-            // [MODIFIED]: 解析当前HEAD对应的分支名和哈希值
+
             String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
             String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
 
@@ -379,7 +379,7 @@ public class Repository {
             return;
         }
 
-        // [MODIFIED]: 通过 HEAD 拿到当前分支，再拿到当前的 commit 哈希，赋给新分支
+
         String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
         String currentCommitHash = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
         Utils.writeContents(newBranch, currentCommitHash);
