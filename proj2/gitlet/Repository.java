@@ -2,9 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import static gitlet.Utils.*;
 
@@ -406,6 +404,21 @@ public class Repository {
 
             }
         }
+
+    }
+
+    public static void branchFunction(String branch){
+        File newBranch = join(GITLET_DIR, "branch", branch);
+
+
+        if (newBranch.exists()) {
+            System.out.print("A branch with that name already exists.");
+            return;
+        }
+
+
+        String currentCommitHash = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+        Utils.writeContents(newBranch, currentCommitHash);
 
     }
 }
