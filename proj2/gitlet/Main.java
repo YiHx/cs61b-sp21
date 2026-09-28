@@ -160,9 +160,13 @@ public class Main {
                 }
                 Repository.mergeFunction(args[1]);
                 break;
+            default:
+                System.out.print("No command with that name exists.");
+                System.exit(0);
+                break;
 
 
-            // TODO: FILL THE REST IN
+
         }
     }
 }
