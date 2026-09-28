@@ -149,6 +149,18 @@ public class Main {
                 }
                 Repository.resetFunction(args[1]);
                 System.exit(0);
+            case "merge":
+                if(args.length > 2){
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
+                }
+                if(!Repository.GITLET_DIR.exists()){
+                    System.out.println("Not in an initialized Gitlet directory.");
+                    System.exit(0);
+                }
+                Repository.mergeFunction(args[1]);
+                break;
+
 
             // TODO: FILL THE REST IN
         }
