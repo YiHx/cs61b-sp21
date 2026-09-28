@@ -69,23 +69,43 @@ public class Repository {
         }
         File indexFile = join(GITLET_DIR, "index");
         File BlobsFile = join(GITLET_DIR, "objects", "Blobs");
-        List<String> alreadyFile = Utils.plainFilenamesIn(BlobsFile);
-        if (alreadyFile != null) {
-            for (String it : alreadyFile) {
-                if (sha1(readContents(join(BlobsFile, it))).equals(sha1(readContents(directFile)))) {
-                    File checkFile = join(indexFile, sha1(readContents(directFile)));
-                    if (checkFile.exists()) {
-                        Utils.restrictedDelete(checkFile);
-                    }
-                    return;
-                }
+
+        String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+        String currentCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
+        Commit currentCommit = Utils.readObject(join(GITLET_DIR, "objects", "commits", currentCommitSha1), Commit.class);
+
+        String fileContentSha1 = Utils.sha1(Utils.readContents(directFile));
+
+        if (currentCommit.commitFile.containsKey(fileName) &&
+                currentCommit.commitFile.get(fileName).equals(fileContentSha1)) {
+            File checkFile = join(indexFile, fileName);
+            if (checkFile.exists()) {
+                Utils.restrictedDelete(checkFile);
             }
+            File stageCheck = join(GITLET_DIR, "stage", fileName);
+            if (stageCheck.exists()) {
+                Utils.restrictedDelete(stageCheck);
+            }
+            return;
         }
+
         byte[] thisFile = Utils.readContents(directFile);
         Utils.writeContents(join(indexFile, fileName), thisFile);
     }
 
     public static void commitFunction(String commitMessage) {
+        if (commitMessage == null || commitMessage.isEmpty()) {
+            System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
+
+        List<String> indexFiles = Utils.plainFilenamesIn(join(GITLET_DIR, "index"));
+        List<String> stageFiles = Utils.plainFilenamesIn(join(GITLET_DIR, "stage"));
+        if ((indexFiles == null || indexFiles.isEmpty()) && (stageFiles == null || stageFiles.isEmpty())) {
+            System.out.println("No changes added to the commit.");
+            System.exit(0);
+        }
+
         String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
         String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
 
@@ -97,17 +117,18 @@ public class Repository {
         nowCommit.commitFile = lastCommit.commitFile;
         File indexFile = join(GITLET_DIR, "index");
         List<String> fileName = Utils.plainFilenamesIn(indexFile);
-        if (fileName == null) {
-            return;
+
+        if (fileName != null) {
+            for (String nowFile : fileName) {
+                File nowFileDirect = join(indexFile, nowFile);
+                String nowFileShaString = Utils.sha1(Utils.readContents(nowFileDirect));
+                nowCommit.commitFile.put(nowFile, nowFileShaString);
+                File BlobFile = join(GITLET_DIR, "objects", "Blobs", nowFileShaString);
+                Utils.writeContents(BlobFile, Utils.readContents(nowFileDirect));
+                nowFileDirect.delete();
+            }
         }
-        for (String nowFile : fileName) {
-            File nowFileDirect = join(indexFile, nowFile);
-            String nowFileShaString = Utils.sha1(Utils.readContents(nowFileDirect));
-            nowCommit.commitFile.put(nowFile, nowFileShaString);
-            File BlobFile = join(GITLET_DIR, "objects", "Blobs", nowFileShaString);
-            Utils.writeContents(BlobFile, Utils.readContents(nowFileDirect));
-            nowFileDirect.delete();
-        }
+
         File stageFile = join(GITLET_DIR, "stage");
         List<String> allStageFile = Utils.plainFilenamesIn(stageFile);
         if (allStageFile != null) {
@@ -118,6 +139,7 @@ public class Repository {
                 nowFileDirect.delete();
             }
         }
+
         File nowFile = join(GITLET_DIR, "objects", "commits");
         String nowSha1String = Utils.sha1(Utils.serialize(nowCommit));
         Utils.writeObject(join(nowFile, nowSha1String), nowCommit);
@@ -172,6 +194,7 @@ public class Repository {
             }
             System.out.printf("Date: %s\n", lastCommit.date);
             System.out.println(lastCommit.message);
+            System.out.println();
             lastCommitSha1 = lastCommit.parents[0];
             commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
             lastCommit = Utils.readObject(commitFile, Commit.class);
@@ -187,6 +210,7 @@ public class Repository {
         }
         System.out.printf("Date: %s\n", lastCommit.date);
         System.out.println(lastCommit.message);
+        System.out.println();
     }
 
     public static void globalLogFunction() {
@@ -204,6 +228,7 @@ public class Repository {
             }
             System.out.printf("Date: %s\n", nowFileCommit.date);
             System.out.println(nowFileCommit.message);
+            System.out.println();
         }
     }
 
@@ -278,34 +303,51 @@ public class Repository {
                 System.out.println("File does not exist in that commit.");
                 System.exit(0);
             }
-            File thisFile = join(GITLET_DIR, "objects", lastCommit.commitFile.get(args[2]));
+            File thisFile = join(GITLET_DIR, "objects", "Blobs", lastCommit.commitFile.get(args[2]));
             File theChangeFile = join(CWD, args[2]);
             Utils.writeContents(theChangeFile, Utils.readContents(thisFile));
         }
 
         if (args.length == 4) {
+            if (!Objects.equals(args[2], "--")) {
+                System.out.println("Incorrect operands.");
+                System.exit(0);
+            }
+
             String thisFileName = args[3];
             String thisCommitSha1 = args[1];
-            File lastCommitFold = join(GITLET_DIR, "objects", "commits", thisCommitSha1);
-            if (!lastCommitFold.exists()) {
+            String realCommitSha1 = null;
+
+            List<String> allCommits = Utils.plainFilenamesIn(join(GITLET_DIR, "objects", "commits"));
+            if (allCommits != null) {
+                for (String id : allCommits) {
+                    if (id.startsWith(thisCommitSha1)) {
+                        realCommitSha1 = id;
+                        break;
+                    }
+                }
+            }
+
+            if (realCommitSha1 == null) {
                 System.out.println("No commit with that id exists.");
                 System.exit(0);
             }
+
+            File lastCommitFold = join(GITLET_DIR, "objects", "commits", realCommitSha1);
             Commit lastCommit = Utils.readObject(lastCommitFold, Commit.class);
+
             if (!lastCommit.commitFile.containsKey(thisFileName)) {
                 System.out.println("File does not exist in that commit.");
                 System.exit(0);
             }
-            File thisFile = join(GITLET_DIR, "objects", lastCommit.commitFile.get(thisFileName));
+            File thisFile = join(GITLET_DIR, "objects", "Blobs", lastCommit.commitFile.get(thisFileName));
             File thisChangeFile = join(CWD, thisFileName);
             Utils.writeContents(thisChangeFile, Utils.readContents(thisFile));
-
         }
 
         if (args.length == 2) {
             String willChangeBranch = args[1];
             List<String> allBranch = Utils.plainFilenamesIn(join(GITLET_DIR, "branch"));
-
 
             String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
             String lastCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
@@ -314,7 +356,6 @@ public class Repository {
                 System.out.println("No such branch exists.");
                 System.exit(0);
             }
-
 
             if (willChangeBranch.equals(currentBranch)) {
                 System.out.println("No need to checkout the current branch.");
@@ -329,8 +370,8 @@ public class Repository {
                 if (otherBranch.commitFile.containsKey(now)) {
                     File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
                     Commit lastCommit = Utils.readObject(commitFile, Commit.class);
-                    List<String> willDeleteFile = Utils.plainFilenamesIn(join(GITLET_DIR, "stage"));
-                    if (!willDeleteFile.contains(now) && !lastCommit.commitFile.containsKey(now)) {
+                    List<String> willDeleteFile = Utils.plainFilenamesIn(join(GITLET_DIR, "index"));
+                    if (willDeleteFile != null && !willDeleteFile.contains(now) && !lastCommit.commitFile.containsKey(now)) {
                         System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                         System.exit(0);
                     }
@@ -339,7 +380,7 @@ public class Repository {
 
             for (var it : otherBranch.commitFile.entrySet()) {
                 File thisFile = join(CWD, it.getKey());
-                Utils.writeContents(thisFile, Utils.readContents(join(GITLET_DIR, "objects", "blobs", it.getValue())));
+                Utils.writeContents(thisFile, Utils.readContents(join(GITLET_DIR, "objects", "Blobs", it.getValue())));
             }
             File commitFile = join(GITLET_DIR, "objects", "commits", lastCommitSha1);
             Commit lastCommit = Utils.readObject(commitFile, Commit.class);
@@ -377,7 +418,6 @@ public class Repository {
             System.out.print("A branch with that name already exists.");
             return;
         }
-
 
         String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
         String currentCommitHash = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
@@ -423,7 +463,6 @@ public class Repository {
             System.exit(0);
         }
 
-
         File targetCommitFile = join(commitsDir, targetCommitSha1);
         Commit targetCommit = Utils.readObject(targetCommitFile, Commit.class);
 
@@ -432,13 +471,11 @@ public class Repository {
         File currentCommitFile = join(commitsDir, currentCommitSha1);
         Commit currentCommit = Utils.readObject(currentCommitFile, Commit.class);
 
-
         List<String> cwdFiles = Utils.plainFilenamesIn(CWD);
         List<String> stagedFiles = Utils.plainFilenamesIn(join(GITLET_DIR, "index"));
 
         if (cwdFiles != null) {
             for (String fileName : cwdFiles) {
-
                 if (targetCommit.commitFile.containsKey(fileName)) {
                     boolean isTrackedByCurrent = currentCommit.commitFile.containsKey(fileName);
                     boolean isStaged = (stagedFiles != null && stagedFiles.contains(fileName));
@@ -451,7 +488,6 @@ public class Repository {
             }
         }
 
-
         for (var entry : targetCommit.commitFile.entrySet()) {
             String fileName = entry.getKey();
             String blobSha1 = entry.getValue();
@@ -460,13 +496,11 @@ public class Repository {
             Utils.writeContents(cwdFile, Utils.readContents(blobFile));
         }
 
-
         for (String currentFile : currentCommit.commitFile.keySet()) {
             if (!targetCommit.commitFile.containsKey(currentFile)) {
                 Utils.restrictedDelete(join(CWD, currentFile));
             }
         }
-
 
         File currentBranchFile = join(GITLET_DIR, "branch", currentBranch);
         Utils.writeContents(currentBranchFile, targetCommitSha1);
@@ -664,5 +698,4 @@ public class Repository {
             System.out.println("Encountered a merge conflict.");
         }
     }
-
 }
