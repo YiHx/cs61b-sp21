@@ -405,4 +405,88 @@ public class Repository {
         Utils.restrictedDelete(thisBranch);
     }
 
+    public static void resetFunction(String thisCommitId) {
+        File commitsDir = join(GITLET_DIR, "objects", "commits");
+        List<String> allCommits = Utils.plainFilenamesIn(commitsDir);
+        String targetCommitSha1 = null;
+
+        if (allCommits != null) {
+            for (String cId : allCommits) {
+                if (cId.startsWith(thisCommitId)) {
+                    targetCommitSha1 = cId;
+                    break;
+                }
+            }
+        }
+
+        if (targetCommitSha1 == null) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+
+
+        File targetCommitFile = join(commitsDir, targetCommitSha1);
+        Commit targetCommit = Utils.readObject(targetCommitFile, Commit.class);
+
+        String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+        String currentCommitSha1 = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
+        File currentCommitFile = join(commitsDir, currentCommitSha1);
+        Commit currentCommit = Utils.readObject(currentCommitFile, Commit.class);
+
+
+        List<String> cwdFiles = Utils.plainFilenamesIn(CWD);
+        List<String> stagedFiles = Utils.plainFilenamesIn(join(GITLET_DIR, "index"));
+
+        if (cwdFiles != null) {
+            for (String fileName : cwdFiles) {
+
+                if (targetCommit.commitFile.containsKey(fileName)) {
+                    boolean isTrackedByCurrent = currentCommit.commitFile.containsKey(fileName);
+                    boolean isStaged = (stagedFiles != null && stagedFiles.contains(fileName));
+
+                    if (!isTrackedByCurrent && !isStaged) {
+                        System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                        System.exit(0);
+                    }
+                }
+            }
+        }
+
+
+        for (var entry : targetCommit.commitFile.entrySet()) {
+            String fileName = entry.getKey();
+            String blobSha1 = entry.getValue();
+            File blobFile = join(GITLET_DIR, "objects", "Blobs", blobSha1);
+            File cwdFile = join(CWD, fileName);
+            Utils.writeContents(cwdFile, Utils.readContents(blobFile));
+        }
+
+
+        for (String currentFile : currentCommit.commitFile.keySet()) {
+            if (!targetCommit.commitFile.containsKey(currentFile)) {
+                Utils.restrictedDelete(join(CWD, currentFile));
+            }
+        }
+
+
+        File currentBranchFile = join(GITLET_DIR, "branch", currentBranch);
+        Utils.writeContents(currentBranchFile, targetCommitSha1);
+
+        File indexDir = join(GITLET_DIR, "index");
+        File[] indexFiles = indexDir.listFiles();
+        if (indexFiles != null) {
+            for (File file : indexFiles) {
+                file.delete();
+            }
+        }
+
+        File stageDir = join(GITLET_DIR, "stage");
+        File[] stageFiles = stageDir.listFiles();
+        if (stageFiles != null) {
+            for (File file : stageFiles) {
+                file.delete();
+            }
+        }
+    }
+
 }
