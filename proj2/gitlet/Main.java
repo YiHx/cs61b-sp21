@@ -127,6 +127,17 @@ public class Main {
                 }
                 Repository.branchFunction(args[1]);
                 break;
+            case "rm-branch":
+                if(args.length > 2){
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
+                }
+                if(!Repository.GITLET_DIR.exists()){
+                    System.out.println("Not in an initialized Gitlet directory.");
+                    System.exit(0);
+                }
+                Repository.rmBranchFunction(args[1]);
+                break;
 
             // TODO: FILL THE REST IN
         }

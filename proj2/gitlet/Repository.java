@@ -384,4 +384,25 @@ public class Repository {
         String currentCommitHash = Utils.readContentsAsString(join(GITLET_DIR, "branch", currentBranch));
         Utils.writeContents(newBranch, currentCommitHash);
     }
+
+    public static void rmBranchFunction(String branchName){
+        File allBranch = join(GITLET_DIR,"branch");
+        List<String> allBranchName = Utils.plainFilenamesIn(allBranch);
+        if (allBranchName != null && !allBranchName.contains(branchName)) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+
+        String currentBranch = Utils.readContentsAsString(join(GITLET_DIR, "HEAD"));
+
+        File thisBranch = join(GITLET_DIR,"branch",branchName);
+        String thisBranchName = Utils.readContentsAsString(thisBranch);
+        if(currentBranch.equals(thisBranchName)){
+            System.out.println("Cannot remove the current branch.");
+            System.exit(0);
+        }
+
+        Utils.restrictedDelete(thisBranch);
+    }
+
 }
